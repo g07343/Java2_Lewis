@@ -15,12 +15,15 @@ package com.matthewlewis.sportscaster;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.matthewlewis.sportscaster.NetworkManager;
 
 public class MainActivity extends Activity {
 
@@ -28,8 +31,18 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         
+        NetworkManager manager = new NetworkManager();
+        Boolean connected = manager.connectionStatus(this);
+        TextView warningField = (TextView) findViewById(R.id.internet_warning);
+        if (connected)
+        {
+        	Log.i("CONNECTION_CHECK", "Good connection");
+        	warningField.setText("Internet Connected!");
+        } else {
+        	Log.i("CONNECTION_CHECK", "No connection");
+        	warningField.setText("No internet!");
+        }
     }
 
 

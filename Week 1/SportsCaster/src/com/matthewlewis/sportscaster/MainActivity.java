@@ -30,9 +30,10 @@ import com.matthewlewis.sportscaster.NetworkManager;
 
 public class MainActivity extends Activity {
 
-	private static String apiURL = "http://api.espn.com/v1/now/popular?apikey=q82zaw4uydmpw6ccfcgh8ze2";
+	private static String apiURL = "http://api.espn.com/v1/now/top?apikey=q82zaw4uydmpw6ccfcgh8ze2";
 	private static TextView statusField;
-	private static Context context;
+	public static Context context;
+	public static String fileName = "Stories.txt";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +99,8 @@ public class MainActivity extends Activity {
 				{
 					response = (String) msg.obj;
 					Log.i("HANDLE_MESSAGE", response);
+				} else {
+					statusField.setText("Error retrieving data!");
 				}
 			}
 		}

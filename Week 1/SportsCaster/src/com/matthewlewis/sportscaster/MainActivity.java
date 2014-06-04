@@ -30,7 +30,7 @@ import com.matthewlewis.sportscaster.NetworkManager;
 
 public class MainActivity extends Activity {
 
-	private static String apiURL = "http://api.espn.com/v1/now";
+	private static String apiURL = "http://api.espn.com/v1/now/popular?apikey=q82zaw4uydmpw6ccfcgh8ze2";
 	private static TextView statusField;
 	private static Context context;
 

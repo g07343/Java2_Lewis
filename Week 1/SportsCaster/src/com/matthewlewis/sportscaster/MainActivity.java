@@ -9,7 +9,7 @@
  * 
  * Purpose MainActivity contains the base functionality for the program.  After launch, it checks for an Internet connection, 
  * and if found, pulls data for display.  If one is not found, it attempts to load previously saved data, before finally
- * alerting the user to make sure they have an internet connection
+ * alerting the user to make sure they have an Internet connection
  * 
  * 
  */

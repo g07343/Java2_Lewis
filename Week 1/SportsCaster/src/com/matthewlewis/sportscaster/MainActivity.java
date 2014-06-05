@@ -29,9 +29,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.matthewlewis.sportscaster.NetworkManager;
 
@@ -43,37 +46,62 @@ public class MainActivity extends Activity {
 	public static String fileName = "Stories.txt";
 	static FileManager fileManager;
 	static ListView listview;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		context = this;
-		statusField  = (TextView) findViewById(R.id.internet_warning);
-		NetworkManager manager = new NetworkManager();
+		statusField = (TextView) findViewById(R.id.internet_warning);
+		final NetworkManager manager = new NetworkManager();
+		final Button reloadBtn = (Button) findViewById(R.id.reload_btn);
 		Boolean connected = manager.connectionStatus(this);
-		
+		reloadBtn.setVisibility(View.GONE);
+
 		listview = (ListView) findViewById(R.id.list);
-		View listHeader = this.getLayoutInflater().inflate(R.layout.header, null);
+		View listHeader = this.getLayoutInflater().inflate(R.layout.header,
+				null);
 		listview.addHeaderView(listHeader);
-		
+
 		if (connected) {
 			Log.i("CONNECTION_CHECK", "Good connection");
-			statusField.setText("Internet Connected!");
-
-			final ApiHandler apiHandler = new ApiHandler(this);
-
-			Messenger apiMessenger = new Messenger(apiHandler);
-			Intent startApiService = new Intent(context, APIService.class);
-			startApiService.putExtra(APIService.MESSENGER_KEY, apiMessenger);
-			startApiService.putExtra(APIService.API_KEY, apiURL);
-			startService(startApiService);
-			statusField.setText("Getting data...");
-
+			startRetrieval();
 		} else {
 			Log.i("CONNECTION_CHECK", "No connection");
-			statusField.setText("No internet!");
+			fileManager = FileManager.GetInstance();
+			String savedData = fileManager.readFile(context, fileName);
+
+			if (savedData != null && !savedData.isEmpty()) {
+				statusField.setVisibility(View.GONE);
+				Toast.makeText(getApplicationContext(), "No Internet Connection.  Displaying old stories.",
+						   Toast.LENGTH_LONG).show();
+				displayData();
+			} else {
+				statusField.setText("No internet! Please check your internet connection.");
+				reloadBtn.setVisibility(View.VISIBLE);
+				reloadBtn.setOnClickListener(new OnClickListener() {
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						Boolean connected = manager.connectionStatus(context);
+						if (connected) {
+							reloadBtn.setVisibility(View.GONE);
+							startRetrieval();
+						}
+					}
+				});
+			}
+
 		}
+	}
+
+	public void startRetrieval() {
+		final ApiHandler apiHandler = new ApiHandler(this);
+		Messenger apiMessenger = new Messenger(apiHandler);
+		Intent startApiService = new Intent(context, APIService.class);
+		startApiService.putExtra(APIService.MESSENGER_KEY, apiMessenger);
+		startApiService.putExtra(APIService.API_KEY, apiURL);
+		startService(startApiService);
+		statusField.setText("Getting data...");
 	}
 
 	@Override
@@ -108,34 +136,32 @@ public class MainActivity extends Activity {
 			MainActivity activity = mActivity.get();
 			if (activity != null) {
 				Boolean response;
-				if (msg.arg1 == RESULT_OK && msg.obj != null)
-				{
+				if (msg.arg1 == RESULT_OK && msg.obj != null) {
 					response = (Boolean) msg.obj;
-					Log.i("HANDLE_MESSAGE", "Boolean was " +response);
-					if (response == true)
-					{
-						displayData();						
+					Log.i("HANDLE_MESSAGE", "Boolean was " + response);
+					if (response == true) {
+						displayData();
 					} else {
 						statusField.setText("Error retrieving data!");
-					}				
+					}
 				} else {
 					statusField.setText("Error retrieving data!");
 				}
 			}
 		}
 	}
-	
+
 	public static void displayData() {
+		statusField.setVisibility(View.GONE);
 		fileManager = FileManager.GetInstance();
 		String rawData = fileManager.readFile(context, fileName);
 		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
 		try {
-			JSONObject rawJson = new JSONObject(rawData);			
+			JSONObject rawJson = new JSONObject(rawData);
 			JSONArray stories = (JSONArray) rawJson.get("feed");
 			System.out.println("NUMBER OF STORIES:  " + stories.length());
 			JSONObject storyObject;
-			for (int i = 0; i < stories.length(); i++)
-			{
+			for (int i = 0; i < stories.length(); i++) {
 				storyObject = stories.getJSONObject(i);
 				String date = storyObject.getString("lastModified");
 				String headline = storyObject.getString("headline");
@@ -143,18 +169,21 @@ public class MainActivity extends Activity {
 				System.out.println("Date was:  " + date);
 				System.out.println("Title was:  " + headline);
 				System.out.println("Description was:  " + description);
-				
+
 				HashMap<String, String> dataMap = new HashMap<String, String>();
 				dataMap.put("date", date);
-				dataMap.put("headline",headline);
-				dataMap.put("description",description);
-				
+				dataMap.put("headline", headline);
+				dataMap.put("description", description);
+
 				list.add(dataMap);
 			}
-			
-			SimpleAdapter adapter = new SimpleAdapter(context, list, R.layout.row, new String[]{"headline", "date", "description"}, new int[]{R.id.title, R.id.date, R.id.description});
+
+			SimpleAdapter adapter = new SimpleAdapter(context, list,
+					R.layout.row, new String[] { "headline", "date",
+							"description" }, new int[] { R.id.title, R.id.date,
+							R.id.description });
 			listview.setAdapter(adapter);
-			
+
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

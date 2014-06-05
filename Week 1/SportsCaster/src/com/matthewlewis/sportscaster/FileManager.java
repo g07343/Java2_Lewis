@@ -13,6 +13,7 @@
 package com.matthewlewis.sportscaster;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -62,29 +63,35 @@ public class FileManager {
 		String content = "";
 		FileInputStream fis = null;
 		
-		try {
-			fis = context.openFileInput(fileName);
-			BufferedInputStream bufferedInput = new BufferedInputStream(fis);
-			byte[] contentBytes = new byte[1024];
-			int bytesRead = 0;
-			StringBuffer buffer = new StringBuffer();
-			
-			while((bytesRead = bufferedInput.read(contentBytes)) != -1) {
-				content = new String(contentBytes, 0, bytesRead);
-				buffer.append(content);
-			}
-			content = buffer.toString();
-		} catch(Exception e) {
-			Log.e("READ_FILE", "Error reading file");
-		} finally {
+		File savedData = MainActivity.context.getFileStreamPath(MainActivity.fileName);
+		if (savedData.exists())
+		{
 			try {
-				fis.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				Log.e("READ_FILE", "Error closing input stream");
+				fis = context.openFileInput(fileName);
+				BufferedInputStream bufferedInput = new BufferedInputStream(fis);
+				byte[] contentBytes = new byte[1024];
+				int bytesRead = 0;
+				StringBuffer buffer = new StringBuffer();
+				
+				while((bytesRead = bufferedInput.read(contentBytes)) != -1) {
+					content = new String(contentBytes, 0, bytesRead);
+					buffer.append(content);
+				}
+				content = buffer.toString();
+			} catch(Exception e) {
+				
+				Log.i("READ_FILE", "Error reading file");
+				return content;
+			} finally {
+				try {
+					fis.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					Log.i("READ_FILE", "Error closing input stream");
+				}
 			}
-		}
+		}	
 		return content;
 	}
 }

@@ -15,4 +15,7 @@
     <item
         type="id"
         name="description"/>
+    <item
+        type="id"
+        name="reload_btn"/>
 </resources>

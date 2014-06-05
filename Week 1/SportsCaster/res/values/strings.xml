@@ -5,7 +5,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 	<string name="default_warning">Default warning</string>
-	<string name="title_text">Title</string>
+	<string name="title_text">Title (Bold)</string>
 	<string name="date_text">Date</string>
-	<string name="description_text">Description</string>
+	<string name="description_text">Description (in white sections)</string>
+	<string name="reloadBtn_text">Reload</string>
 </resources>

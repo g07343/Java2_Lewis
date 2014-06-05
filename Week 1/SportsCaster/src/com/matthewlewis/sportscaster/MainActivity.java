@@ -40,7 +40,7 @@ import com.matthewlewis.sportscaster.NetworkManager;
 
 public class MainActivity extends Activity {
 
-	private static String apiURL = "http://api.espn.com/v1/now/top?limit=5&apikey=q82zaw4uydmpw6ccfcgh8ze2";
+	private static String apiURL = "http://api.espn.com/v1/now/popular?limit=20&apikey=q82zaw4uydmpw6ccfcgh8ze2";
 	private static TextView statusField;
 	public static Context context;
 	public static String fileName = "Stories.txt";
@@ -155,7 +155,7 @@ public class MainActivity extends Activity {
 		statusField.setVisibility(View.GONE);
 		fileManager = FileManager.GetInstance();
 		String rawData = fileManager.readFile(context, fileName);
-		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+		ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
 		try {
 			JSONObject rawJson = new JSONObject(rawData);
 			JSONArray stories = (JSONArray) rawJson.get("feed");
@@ -163,25 +163,80 @@ public class MainActivity extends Activity {
 			JSONObject storyObject;
 			for (int i = 0; i < stories.length(); i++) {
 				storyObject = stories.getJSONObject(i);
-				String date = storyObject.getString("lastModified");
-				String headline = storyObject.getString("headline");
-				String description = storyObject.getString("description");
-				System.out.println("Date was:  " + date);
-				System.out.println("Title was:  " + headline);
-				System.out.println("Description was:  " + description);
+				
+				String date;
+				try {
+					date = storyObject.getString("lastModified");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					date = "No date provided";
+					e.printStackTrace();
+				}
+				
+				String headline;
+				try {
+					headline = storyObject.getString("headline");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					headline = "No title given...";
+					e.printStackTrace();
+				}
+				
+				String description;
+				try {
+					description = storyObject.getString("description");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					description = "No description provided for this story.";
+					e.printStackTrace();
+				}
+				
+				int sportIcon;
+				
+				try {
+					JSONArray detailsArray = storyObject.getJSONArray("categories");
+					JSONObject firstItem = detailsArray.getJSONObject(0);
+					String sportId = firstItem.getString("sportId");
+					int sportNum = Integer.parseInt(sportId);
+					switch (sportNum) {
+						case 28:
+							sportIcon = R.drawable.football;
+							break;
+						case 90:
+							sportIcon = R.drawable.hockey;
+							break;
+						case 46:
+							sportIcon = R.drawable.basketball;
+							break;
+						case 10:
+							sportIcon = R.drawable.baseball;
+							break;
+						default:
+							sportIcon = R.drawable.generic;
+							break;
+					}
+					
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					Log.i("DISPLAY_DATA", "error accessing sportID");
+					sportIcon = R.drawable.generic;
+				}
+				
 
-				HashMap<String, String> dataMap = new HashMap<String, String>();
+				HashMap<String, Object> dataMap = new HashMap<String, Object>();
 				dataMap.put("date", date);
 				dataMap.put("headline", headline);
 				dataMap.put("description", description);
-
+				dataMap.put("icon", Integer.toString(sportIcon));
+				
 				list.add(dataMap);
 			}
 
 			SimpleAdapter adapter = new SimpleAdapter(context, list,
-					R.layout.row, new String[] { "headline", "date",
-							"description" }, new int[] { R.id.title, R.id.date,
-							R.id.description });
+					R.layout.row, new String[] {(String) "headline", (String)"date",
+							"description", "icon" }, new int[] { R.id.title, R.id.date,
+							R.id.description, R.id.sport_icon });
 			listview.setAdapter(adapter);
 
 		} catch (JSONException e) {

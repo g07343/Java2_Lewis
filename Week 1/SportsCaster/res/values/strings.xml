@@ -9,4 +9,5 @@
 	<string name="date_text">Date</string>
 	<string name="description_text">Description (in white sections)</string>
 	<string name="reloadBtn_text">Reload</string>
+	<string name="icon_text">Icon to represent a sport</string>
 </resources>

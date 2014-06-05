@@ -18,4 +18,7 @@
     <item
         type="id"
         name="reload_btn"/>
+    <item
+        type="id" 
+        name="sport_icon"/>
 </resources>

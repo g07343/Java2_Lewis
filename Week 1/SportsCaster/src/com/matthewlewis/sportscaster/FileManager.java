@@ -45,6 +45,7 @@ public class FileManager {
 			fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
 			fos.write(content.getBytes());
 			Log.i("WRITE_FILE", "Success");
+			wasWritten = true;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

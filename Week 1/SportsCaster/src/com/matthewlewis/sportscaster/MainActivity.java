@@ -13,6 +13,12 @@
 package com.matthewlewis.sportscaster;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
@@ -30,11 +36,12 @@ import com.matthewlewis.sportscaster.NetworkManager;
 
 public class MainActivity extends Activity {
 
-	private static String apiURL = "http://api.espn.com/v1/now/top?apikey=q82zaw4uydmpw6ccfcgh8ze2";
+	private static String apiURL = "http://api.espn.com/v1/now/top?limit=5&apikey=q82zaw4uydmpw6ccfcgh8ze2";
 	private static TextView statusField;
 	public static Context context;
 	public static String fileName = "Stories.txt";
-
+	static FileManager fileManager;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -94,16 +101,55 @@ public class MainActivity extends Activity {
 		public void handleMessage(Message msg) {
 			MainActivity activity = mActivity.get();
 			if (activity != null) {
-				String response;
+				Boolean response;
 				if (msg.arg1 == RESULT_OK && msg.obj != null)
 				{
-					response = (String) msg.obj;
-					Log.i("HANDLE_MESSAGE", response);
+					response = (Boolean) msg.obj;
+					Log.i("HANDLE_MESSAGE", "Boolean was " +response);
+					if (response == true)
+					{
+						displayData();						
+					} else {
+						statusField.setText("Error retrieving data!");
+					}				
 				} else {
 					statusField.setText("Error retrieving data!");
 				}
 			}
 		}
 	}
-
+	
+	public static void displayData() {
+		fileManager = FileManager.GetInstance();
+		String rawData = fileManager.readFile(context, fileName);
+		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+		try {
+			JSONObject rawJson = new JSONObject(rawData);			
+			JSONArray stories = (JSONArray) rawJson.get("feed");
+			System.out.println("NUMBER OF STORIES:  " + stories.length());
+			JSONObject storyObject;
+			for (int i = 0; i < stories.length(); i++)
+			{
+				storyObject = stories.getJSONObject(i);
+				String date = storyObject.getString("lastModified");
+				String headline = storyObject.getString("headline");
+				String description = storyObject.getString("description");
+				System.out.println("Date was:  " + date);
+				System.out.println("Title was:  " + headline);
+				System.out.println("Description was:  " + description);
+				
+				HashMap<String, String> dataMap = new HashMap<String, String>();
+				dataMap.put("date", date);
+				dataMap.put("headline",headline);
+				dataMap.put("description",description);
+				
+				list.add(dataMap);
+			}
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			Log.e("DISPLAY_DATA", "Error parsing JSON from string!");
+		}
+	}
 }

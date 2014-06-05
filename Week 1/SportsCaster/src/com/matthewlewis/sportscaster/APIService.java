@@ -32,6 +32,8 @@ public class APIService extends IntentService{
 
 	public static final String MESSENGER_KEY = "messenger";
 	public static final String API_KEY = "api";
+	private Boolean writeSuccess;
+	
 	FileManager fileManager;
 	
 	public APIService() {
@@ -51,11 +53,12 @@ public class APIService extends IntentService{
 		try {
 			URL url = new URL(urlString);
 			response = getResponse(url);
-			Log.i("RESPONSE", response);
+			//Log.i("RESPONSE", response);
 			if (!(response.equals("Error retrieving remote data")))
 			{
+				
 				fileManager = FileManager.GetInstance();
-				fileManager.WriteFile(MainActivity.context, MainActivity.fileName, response);
+				writeSuccess = fileManager.WriteFile(MainActivity.context, MainActivity.fileName, response);
 			}
 		} catch (MalformedURLException e1) {
 			// TODO Auto-generated catch block
@@ -65,7 +68,7 @@ public class APIService extends IntentService{
 		
 		Message msg = Message.obtain();
 		msg.arg1 = Activity.RESULT_OK;
-		msg.obj = "Data returned was:  " + response;
+		msg.obj = writeSuccess;
 		try {
 			messenger.send(msg);
 		} catch (RemoteException e) {

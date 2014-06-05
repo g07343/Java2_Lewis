@@ -15,11 +15,9 @@ package com.matthewlewis.sportscaster;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +28,9 @@ import android.os.Messenger;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.matthewlewis.sportscaster.NetworkManager;
@@ -41,6 +42,7 @@ public class MainActivity extends Activity {
 	public static Context context;
 	public static String fileName = "Stories.txt";
 	static FileManager fileManager;
+	static ListView listview;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +52,11 @@ public class MainActivity extends Activity {
 		statusField  = (TextView) findViewById(R.id.internet_warning);
 		NetworkManager manager = new NetworkManager();
 		Boolean connected = manager.connectionStatus(this);
-
+		
+		listview = (ListView) findViewById(R.id.list);
+		View listHeader = this.getLayoutInflater().inflate(R.layout.header, null);
+		listview.addHeaderView(listHeader);
+		
 		if (connected) {
 			Log.i("CONNECTION_CHECK", "Good connection");
 			statusField.setText("Internet Connected!");
@@ -145,6 +151,9 @@ public class MainActivity extends Activity {
 				
 				list.add(dataMap);
 			}
+			
+			SimpleAdapter adapter = new SimpleAdapter(context, list, R.layout.row, new String[]{"headline", "date", "description"}, new int[]{R.id.title, R.id.date, R.id.description});
+			listview.setAdapter(adapter);
 			
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

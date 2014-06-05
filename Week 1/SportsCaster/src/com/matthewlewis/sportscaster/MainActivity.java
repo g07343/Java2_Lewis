@@ -7,7 +7,9 @@
  * 
  * File MainActivity.java
  * 
- * Purpose 
+ * Purpose MainActivity contains the base functionality for the program.  After launch, it checks for an Internet connection, 
+ * and if found, pulls data for display.  If one is not found, it attempts to load previously saved data.
+ * 
  * 
  */
 package com.matthewlewis.sportscaster;
@@ -40,13 +42,15 @@ import com.matthewlewis.sportscaster.NetworkManager;
 
 public class MainActivity extends Activity {
 
-	private static String apiURL = "http://api.espn.com/v1/now/popular?limit=20&apikey=q82zaw4uydmpw6ccfcgh8ze2";
+	//declare class variables
+	private static String apiURL = "http://api.espn.com/v1/now/popular?limit=10&apikey=q82zaw4uydmpw6ccfcgh8ze2";
 	private static TextView statusField;
 	public static Context context;
 	public static String fileName = "Stories.txt";
-	static FileManager fileManager;
-	static ListView listview;
+	private static FileManager fileManager;
+	private static ListView listview;
 
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -73,18 +77,21 @@ public class MainActivity extends Activity {
 
 			if (savedData != null && !savedData.isEmpty()) {
 				statusField.setVisibility(View.GONE);
-				Toast.makeText(getApplicationContext(), "No Internet Connection.  Displaying old stories.",
-						   Toast.LENGTH_LONG).show();
+				Toast.makeText(getApplicationContext(),
+						"No Internet Connection.  Displaying old stories.",
+						Toast.LENGTH_LONG).show();
 				displayData();
 			} else {
-				statusField.setText("No internet! Please check your internet connection.");
+				statusField
+						.setText("No internet! Please check your internet connection.");
 				reloadBtn.setVisibility(View.VISIBLE);
 				reloadBtn.setOnClickListener(new OnClickListener() {
 					public void onClick(View v) {
-						// TODO Auto-generated method stub
+						// Re check our Internet connection
 						Boolean connected = manager.connectionStatus(context);
 						if (connected) {
 							reloadBtn.setVisibility(View.GONE);
+							//now that we have internet, get data
 							startRetrieval();
 						}
 					}
@@ -94,6 +101,9 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	/**
+	 * Begin the retrieval of remote JSON data now that we know we have an Internet connection.
+	 */
 	public void startRetrieval() {
 		final ApiHandler apiHandler = new ApiHandler(this);
 		Messenger apiMessenger = new Messenger(apiHandler);
@@ -104,6 +114,7 @@ public class MainActivity extends Activity {
 		statusField.setText("Getting data...");
 	}
 
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -112,6 +123,7 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action bar item clicks here. The action bar will
@@ -124,13 +136,26 @@ public class MainActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
+	/**
+	 * Create a custom Handler class extending the base class and use a weak reference
+	 *  to the MainActivity to avoid memory leaks
+	 */
 	private static class ApiHandler extends Handler {
 		private final WeakReference<MainActivity> mActivity;
 
+		/**
+		 * Instantiates a new api handler.
+		 *
+		 * @param activity the activity
+		 */
 		public ApiHandler(MainActivity activity) {
 			mActivity = new WeakReference<MainActivity>(activity);
 		}
 
+		/* 
+		 * override the base class's handleMessage method and check if we were able to read the saved data or not.
+		 * If so, go ahead and display it using the below displayData method.
+		 */
 		@Override
 		public void handleMessage(Message msg) {
 			MainActivity activity = mActivity.get();
@@ -151,6 +176,10 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	/**
+	 * This method is called once we have determined that data was successfully saved to the device's storage.
+	 * Get this data, and parse it for the information we want before displaying it to the user.
+	 */
 	public static void displayData() {
 		statusField.setVisibility(View.GONE);
 		fileManager = FileManager.GetInstance();
@@ -163,86 +192,85 @@ public class MainActivity extends Activity {
 			JSONObject storyObject;
 			for (int i = 0; i < stories.length(); i++) {
 				storyObject = stories.getJSONObject(i);
-				
+
 				String date;
 				try {
 					date = storyObject.getString("lastModified");
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
+					Log.i("DISPLAY_DATA"," Error retrieving date for story");
 					date = "No date provided";
 					e.printStackTrace();
 				}
-				
+
 				String headline;
 				try {
 					headline = storyObject.getString("headline");
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
+					Log.i("DISPLAY_DATA"," Error retrieving title for story");
 					headline = "No title given...";
 					e.printStackTrace();
 				}
-				
+
 				String description;
 				try {
 					description = storyObject.getString("description");
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
+					Log.i("DISPLAY_DATA"," Error retrieving description for story");
 					description = "No description provided for this story.";
 					e.printStackTrace();
 				}
-				
+
 				int sportIcon;
-				
+
 				try {
-					JSONArray detailsArray = storyObject.getJSONArray("categories");
+					JSONArray detailsArray = storyObject
+							.getJSONArray("categories");
 					JSONObject firstItem = detailsArray.getJSONObject(0);
 					String sportId = firstItem.getString("sportId");
 					int sportNum = Integer.parseInt(sportId);
 					switch (sportNum) {
-						case 28:
-							sportIcon = R.drawable.football;
-							break;
-						case 90:
-							sportIcon = R.drawable.hockey;
-							break;
-						case 46:
-							sportIcon = R.drawable.basketball;
-							break;
-						case 10:
-							sportIcon = R.drawable.baseball;
-							break;
-						default:
-							sportIcon = R.drawable.generic;
-							break;
+					case 28:
+						sportIcon = R.drawable.football;
+						break;
+					case 90:
+						sportIcon = R.drawable.hockey;
+						break;
+					case 46:
+						sportIcon = R.drawable.basketball;
+						break;
+					case 10:
+						sportIcon = R.drawable.baseball;
+						break;
+					default:
+						sportIcon = R.drawable.generic;
+						break;
 					}
-					
+
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					Log.i("DISPLAY_DATA", "error accessing sportID");
 					sportIcon = R.drawable.generic;
 				}
-				
 
 				HashMap<String, Object> dataMap = new HashMap<String, Object>();
 				dataMap.put("date", date);
 				dataMap.put("headline", headline);
 				dataMap.put("description", description);
 				dataMap.put("icon", Integer.toString(sportIcon));
-				
+
 				list.add(dataMap);
 			}
 
 			SimpleAdapter adapter = new SimpleAdapter(context, list,
-					R.layout.row, new String[] {(String) "headline", (String)"date",
-							"description", "icon" }, new int[] { R.id.title, R.id.date,
-							R.id.description, R.id.sport_icon });
+					R.layout.row, new String[] { (String) "headline",
+							(String) "date", "description", "icon" },
+					new int[] { R.id.title, R.id.date, R.id.description,
+							R.id.sport_icon });
 			listview.setAdapter(adapter);
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			Log.e("DISPLAY_DATA", "Error parsing JSON from string!");
+			Log.e("DISPLAY_DATA", "Error parsing JSON from saved data!");
 		}
 	}
 }

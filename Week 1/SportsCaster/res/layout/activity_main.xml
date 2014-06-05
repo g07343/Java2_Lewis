@@ -20,14 +20,17 @@
             android:layout_weight="0.76"
             android:gravity="center"
             android:text="@string/default_warning"
-            android:textColor="@android:color/holo_orange_dark" />
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
 
         <Button
             android:id="@id/reload_btn"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="97dp"
             android:layout_height="31dp"
+            android:background="@android:drawable/btn_default_small"
             android:text="@string/reloadBtn_text" />
+
     </LinearLayout>
 
     <ListView

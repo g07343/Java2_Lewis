@@ -16,7 +16,7 @@
 
         <ImageView
             android:id="@id/sport_icon"
-            android:layout_width="wrap_content"
+            android:layout_width="41dp"
             android:layout_height="41dp"
             android:contentDescription="@string/icon_text"
             android:src="@drawable/transparent" />
@@ -66,6 +66,7 @@
             android:gravity="center"
             android:paddingBottom="15dp"
             android:paddingLeft="5dp"
+            android:textStyle="bold"
             android:text="@string/description_text"
             android:textColor="#FFFFFF" />
     </LinearLayout>

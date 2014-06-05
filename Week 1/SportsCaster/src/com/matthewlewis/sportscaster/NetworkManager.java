@@ -1,3 +1,16 @@
+/*
+ * Author Matthew Lewis
+ * 
+ * Project SportsCaster
+ * 
+ * Package com.matthewlewis.sportscaster
+ * 
+ * File NetworkManager.java
+ * 
+ * Purpose The NetworkManager class simply checks for an internet connection using the Connectivity Service.  It returns a Boolean
+ * to the caller with the result.
+ * 
+ */
 package com.matthewlewis.sportscaster;
 
 import android.content.Context;

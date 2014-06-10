@@ -15,6 +15,7 @@
  */
 package com.matthewlewis.sportscaster;
 
+import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +34,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -50,11 +53,12 @@ public class MainActivity extends Activity {
 	public static String fileName = "Stories.txt";
 	private static FileManager fileManager;
 	private static ListView listview;
-
+	static ArrayList<HashMap<String, Object>> list;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.activity_main);
 		//set our public variable context, so outside classes can access it if needed
 		context = this;
@@ -77,56 +81,87 @@ public class MainActivity extends Activity {
 				null);
 		listview.addHeaderView(listHeader);
 		
-		//if we have network connection
-		if (connected) {
-			Log.i("CONNECTION_CHECK", "Good connection");
-			//call method to begin retrieval of remote data
-			startRetrieval();
-		} else {
-			//no network connection, see if we have local data saved
-			Log.i("CONNECTION_CHECK", "No connection");
-			//get instance of FileManager singleton
-			fileManager = FileManager.GetInstance();
+		
+		if (savedInstanceState != null )
+		{
+			statusField.setVisibility(View.GONE);
+			list = (ArrayList<HashMap<String, Object>>) savedInstanceState.getSerializable("saved");
+			SimpleAdapter adapter = new SimpleAdapter(context, list,
+					R.layout.row, new String[] { (String) "headline",
+							(String) "date", "description", "icon" },
+					new int[] { R.id.title, R.id.date, R.id.description,
+							R.id.sport_icon });
 			
-			//retrieve savedData to a string
-			String savedData = fileManager.readFile(context, fileName);
-			
-			//check if savedData is valid, meaning we had a saved file from a previous session
-			if (savedData != null && !savedData.isEmpty()) {
-				
-				//hide our statusField since we no longer need it
-				statusField.setVisibility(View.GONE);
-				
-				//let user know they are viewing old data due to lack of Internet connection
-				Toast.makeText(getApplicationContext(),
-						"No Internet Connection.  Displaying old stories.",
-						Toast.LENGTH_LONG).show();
-				
-				//now that we have verified old data exists, call method to display it to the user
-				displayData();
+			//set our adapter
+			listview.setAdapter(adapter);
+			//set our onClick listener for our listView
+			listview.setOnItemClickListener(new OnItemClickListener() {
+		        public void onItemClick(AdapterView<?> parent, View view,
+		                int position, long id) {
+		        	//convert the selected int to a position relative to our hashmap array
+		        	int actualSelected = position -=1;
+		        	HashMap<String, Object> dataMap = list.get(actualSelected);
+		        	String title = (String) dataMap.get("headline");
+		        	String date = (String) dataMap.get("date");
+		        	String description = (String) dataMap.get("description");
+		        	
+		        	System.out.println("Selected story was:  " + title + "  "  + date + "  " + description);
+		      
+		        }
+		    });
+		} else {		
+			//if we have network connection
+			if (connected) {
+				Log.i("CONNECTION_CHECK", "Good connection");
+				//call method to begin retrieval of remote data
+				startRetrieval();
 			} else {
-				//no Internet or saved data, alert user they need Internet!
-				statusField.setText("No internet! Please check your internet connection.");
+				//no network connection, see if we have local data saved
+				Log.i("CONNECTION_CHECK", "No connection");
+				//get instance of FileManager singleton
+				fileManager = FileManager.GetInstance();
 				
-				//display our button, which rechecks Internet
-				reloadBtn.setVisibility(View.VISIBLE);
+				//retrieve savedData to a string
+				String savedData = fileManager.readFile(context, fileName);
 				
-				//set onClick listener to check for a change in Internet connectivity
-				reloadBtn.setOnClickListener(new OnClickListener() {
-					public void onClick(View v) {
-						// Re check our Internet connection
-						Boolean connected = manager.connectionStatus(context);
-						if (connected) {
-							//hide our button now, since we no longer need it
-							reloadBtn.setVisibility(View.GONE);
-							//now that we have Internet, get data
-							startRetrieval();
+				//check if savedData is valid, meaning we had a saved file from a previous session
+				if (savedData != null && !savedData.isEmpty()) {
+					
+					//hide our statusField since we no longer need it
+					statusField.setVisibility(View.GONE);
+					
+					//let user know they are viewing old data due to lack of Internet connection
+					Toast.makeText(getApplicationContext(),
+							"No Internet Connection.  Displaying old stories.",
+							Toast.LENGTH_LONG).show();
+					
+					//now that we have verified old data exists, call method to display it to the user
+					displayData(null);
+				} else {
+					//no Internet or saved data, alert user they need Internet!
+					statusField.setText("No internet! Please check your internet connection.");
+					
+					//display our button, which rechecks Internet
+					reloadBtn.setVisibility(View.VISIBLE);
+					
+					//set onClick listener to check for a change in Internet connectivity
+					reloadBtn.setOnClickListener(new OnClickListener() {
+						public void onClick(View v) {
+							// Re check our Internet connection
+							Boolean connected = manager.connectionStatus(context);
+							if (connected) {
+								//hide our button now, since we no longer need it
+								reloadBtn.setVisibility(View.GONE);
+								//now that we have Internet, get data
+								startRetrieval();
+							}
 						}
-					}
-				});
-			}
+					});
+				}
 
+			}
 		}
+		
 	}
 
 	/**
@@ -209,7 +244,7 @@ public class MainActivity extends Activity {
 					//if the boolean is true, data was successfully saved and we can use it
 					if (response == true) {
 						//call the displayData function, which reads, formats, and displays the data to the user
-						displayData();
+						displayData(null);
 					} else {
 						//boolean was false, there was an error saving the data.  Alert user
 						statusField.setText("Error retrieving data!");
@@ -227,7 +262,7 @@ public class MainActivity extends Activity {
 	 * Get this data, and parse it for the information we want before displaying it to the user.  This method needs 
 	 * try/catch blocks around nearly every JSON operation due to ESPN's inconsistency with their responses
 	 */
-	public static void displayData() {
+	public static void displayData(ArrayList<HashMap<String, Object>> data) {
 		//hide our statusField now that we are showing data 
 		statusField.setVisibility(View.GONE);
 		
@@ -237,8 +272,22 @@ public class MainActivity extends Activity {
 		//retrieve stored data using FileManager
 		String rawData = fileManager.readFile(context, fileName);
 		
-		//convert to an arrayList of HashMaps, which contain objects
-		ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+		if (data != null)
+		{
+			list = data;
+			//create a SimpleAdapter in conjunction with the above created data
+			SimpleAdapter adapter = new SimpleAdapter(context, list,
+					R.layout.row, new String[] { (String) "headline",
+							(String) "date", "description", "icon" },
+					new int[] { R.id.title, R.id.date, R.id.description,
+							R.id.sport_icon });
+			
+			//set our adapter
+			listview.setAdapter(adapter);
+		} else {
+			//convert to an arrayList of HashMaps, which contain objects
+			list = new ArrayList<HashMap<String, Object>>();
+		}	
 		try {
 			//convert our raw string to a JSON object
 			JSONObject rawJson = new JSONObject(rawData);
@@ -360,10 +409,36 @@ public class MainActivity extends Activity {
 			
 			//set our adapter
 			listview.setAdapter(adapter);
+			
+			//set our onClick listener for our listView
+			listview.setOnItemClickListener(new OnItemClickListener() {
+		        public void onItemClick(AdapterView<?> parent, View view,
+		                int position, long id) {
+		        	//convert the selected int to a position relative to our hashmap array
+		        	int actualSelected = position -=1;
+		        	HashMap<String, Object> dataMap = list.get(actualSelected);
+		        	String title = (String) dataMap.get("headline");
+		        	String date = (String) dataMap.get("date");
+		        	String description = (String) dataMap.get("description");
+		        	
+		        	System.out.println("Selected story was:  " + title + "  "  + date + "  " + description);
+		      
+		        }
+		    });
 
 		} catch (JSONException e) {
 			e.printStackTrace();
 			Log.e("DISPLAY_DATA", "Error parsing JSON from saved data!");
 		}
 	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		//save the tableView's data so we don't use pull down redundant data again
+		System.out.println("VIEW DESTROYED!!!");
+		savedInstanceState.putSerializable("saved", (Serializable) list);
+		
+		super.onSaveInstanceState(savedInstanceState);
+	}
+	
 }

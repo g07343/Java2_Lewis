@@ -55,6 +55,7 @@ public class MainActivity extends Activity {
 	private static ListView listview;
 	static ArrayList<HashMap<String, Object>> list;
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -333,6 +334,29 @@ public class MainActivity extends Activity {
 					e.printStackTrace();
 				}
 				
+				String url;
+				try {
+					//try to get the url as a string so we can let the user access the ESPN webpage in the detailView
+					JSONObject allLinks = storyObject.getJSONObject("links");
+					url = allLinks.getString("web");
+				} catch (Exception e) {
+					Log.i("DISPLAY_DATA"," Error retrieving URL for story");
+					url = "No link provided for this story.";
+				}
+				
+				String imageURL;	
+				//try to get a link to an image related to the story for viewing within the detailsView
+				try {
+					JSONArray images = storyObject.getJSONArray("images");
+					JSONObject imageObject = images.getJSONObject(0);
+					imageURL = imageObject.getString("url");
+					System.out.println("Link to image was:  " + imageURL);
+				} catch (Exception e) {
+					Log.i("DISPLAY_DATA", "Error getting url for image");
+					imageURL = null;
+				}
+				
+				
 				//create an integer object to reference the different sport icons in Drawable
 				int sportIcon;
 				
@@ -360,15 +384,15 @@ public class MainActivity extends Activity {
 						sportIcon = R.drawable.football;
 						break;
 					case 90:
-						//football - set to hockey icon
+						//hockey - set to hockey icon
 						sportIcon = R.drawable.hockey;
 						break;
 					case 46:
-						//football - set to basketball icon
+						//basketball - set to basketball icon
 						sportIcon = R.drawable.basketball;
 						break;
 					case 10:
-						//baseball
+						//baseball - set to baseball icon
 						sportIcon = R.drawable.baseball;
 						break;
 					default:
@@ -396,6 +420,12 @@ public class MainActivity extends Activity {
 				
 				//add our icon
 				dataMap.put("icon", Integer.toString(sportIcon));
+				
+				//add our link
+				dataMap.put("url", url);
+				
+				//add our image
+				dataMap.put("imageLink", imageURL);
 				
 				//finally, add the above HashMap to our ArrayList
 				list.add(dataMap);

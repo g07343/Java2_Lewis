@@ -45,4 +45,10 @@
     <item
         type="id"
         name="ratingAlert_rating"/>
+    <item
+        type="id"
+        name="detail_shareLabel"/>
+    <item
+        type="id"
+        name="detail_shareBtn"/>
 </resources>

@@ -37,6 +37,7 @@ public class DetailView extends Activity{
 	
 	ImageView storyImage;
 	Button webBtn;
+	Button shareBtn;
 	RatingBar ratingBar;
 	String imageUrl;
 	String title;
@@ -59,6 +60,7 @@ public class DetailView extends Activity{
 		
 		storyImage = (ImageView) findViewById(R.id.detail_image);
 		webBtn = (Button) findViewById(R.id.detail_webBtn);
+		shareBtn = (Button) findViewById(R.id.detail_shareBtn);
 		ratingBar = (RatingBar) findViewById(R.id.detail_rating);
 		
 		TextView titleView = (TextView) findViewById(R.id.detail_title);
@@ -99,8 +101,25 @@ public class DetailView extends Activity{
 					}
 					
 				});
+				
+				//also set up an implicit intent to allow the user to share the story
+				shareBtn.setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View v) {
+						//set up our intent to allow the user to share the story
+						Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+						emailIntent.setType("plain/text");
+						emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, storyUrl);
+						emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Check out this awesome sports story I found with SportsCaster!");
+						startActivity(emailIntent);
+					}
+					
+				});
+				
 			} else {
 				webBtn.setEnabled(false);
+				shareBtn.setEnabled(false);
 			}		
 			
 		} else {

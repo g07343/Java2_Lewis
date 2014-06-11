@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -26,12 +27,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class DetailView extends Activity{
 	
 	ImageView storyImage;
 	Button webBtn;
+	RatingBar ratingBar;
 	String imageUrl;
 	
 	@Override
@@ -51,6 +54,7 @@ public class DetailView extends Activity{
 		
 		storyImage = (ImageView) findViewById(R.id.detail_image);
 		webBtn = (Button) findViewById(R.id.detail_webBtn);
+		ratingBar = (RatingBar) findViewById(R.id.detail_rating);
 		
 		TextView titleView = (TextView) findViewById(R.id.detail_title);
 		titleView.setText(title);
@@ -116,8 +120,13 @@ public class DetailView extends Activity{
 		this.finish();
 	}
 	
+	//call this function when we have signaled the activity is done, and pass the rating back to MainActivity
 	@Override
 	public void finish() {
-		
+		Intent data = new Intent();
+		float rating = ratingBar.getRating();
+		data.putExtra("rating", rating);
+		setResult(RESULT_OK, data);
+		super.finish();
 	}
 }

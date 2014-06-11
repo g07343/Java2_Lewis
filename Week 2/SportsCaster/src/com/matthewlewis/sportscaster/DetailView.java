@@ -125,6 +125,7 @@ public class DetailView extends Activity{
 		} else {
 			//no internet, so leave the default image in place, and disable the web button
 			webBtn.setEnabled(false);
+			shareBtn.setEnabled(false);
 		}
 	}
 	

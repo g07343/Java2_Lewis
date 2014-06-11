@@ -36,6 +36,7 @@ public class DetailView extends Activity{
 	Button webBtn;
 	RatingBar ratingBar;
 	String imageUrl;
+	String title;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,7 @@ public class DetailView extends Activity{
 		Bundle data = getIntent().getExtras();
 		@SuppressWarnings("unchecked")
 		HashMap<String, Object> storyData = (HashMap<String, Object>) data.get("data");
-		String title = (String) storyData.get("headline");
+		title = (String) storyData.get("headline");
 		String date = (String) storyData.get("date");
 		String description = (String) storyData.get("description");
 		imageUrl = (String) storyData.get("imageLink");
@@ -125,7 +126,9 @@ public class DetailView extends Activity{
 	public void finish() {
 		Intent data = new Intent();
 		float rating = ratingBar.getRating();
-		data.putExtra("rating", rating);
+		Integer intRating = (int)rating;
+		data.putExtra("title", title);
+		data.putExtra("rating", intRating);
 		setResult(RESULT_OK, data);
 		super.finish();
 	}

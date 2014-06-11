@@ -17,4 +17,6 @@
 	<string name="detail_actualDate">dynamic date</string>
 	<string name="detail_description">dynamic description</string>
 	<string name="detail_webButton">View on ESPN</string>
+	<string name="ratingAlert_title">Dynamic Title</string>
+	<string name="ratingAlert_mainLabel">Rating was: </string>
 </resources>

@@ -23,21 +23,26 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -486,8 +491,41 @@ public class MainActivity extends Activity {
 		if (resultCode == RESULT_OK && requestCode == 0)
 		{
 			Bundle result = data.getExtras();
-			float rating = (Float) result.get("rating");
+			int rating = (Integer) result.get("rating");
+			String title = (String) result.get("title");
 			System.out.println("Rating returned was:  " + rating);
+			
+			//create our alert dialog
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			
+			LayoutInflater inflater = this.getLayoutInflater();
+			
+			//get our alertView as a view object first so we can alter it's data
+			View ratingAlert = inflater.inflate(R.layout.ratingalert, null);
+			
+			//grab our rating view contained in it and set it to whatever was previously entered in DetailView
+			RatingBar previousRating = (RatingBar) ratingAlert.findViewById(R.id.ratingAlert_rating);
+			previousRating.setRating(rating);
+			
+			//grab our title textview and set it to the title of the story
+			TextView titleView = (TextView) ratingAlert.findViewById(R.id.ratingAlert_title);
+			titleView.setText(title);
+			builder.setView(ratingAlert);
+			
+			
+			
+			builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					dialog.dismiss();
+				}
+			});
+			
+			AlertDialog ratingDialog = builder.create();
+			
+			ratingDialog.show();
 		}
 		
 	}

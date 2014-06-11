@@ -39,4 +39,10 @@
     <item
         type="id"
         name="detail_webBtn"/>
+    <item
+        type="id"
+        name="ratingAlert_title"/>
+    <item
+        type="id"
+        name="ratingAlert_rating"/>
 </resources>

@@ -21,4 +21,22 @@
     <item
         type="id" 
         name="sport_icon"/>
+    <item
+        type="id"
+        name="detail_title"/>
+    <item
+        type="id"
+        name="detail_date"/>
+    <item
+        type="id"
+        name="detail_description"/>
+    <item
+        type="id"
+        name="detail_image"/>
+    <item
+        type="id"
+        name="detail_rating"/>
+    <item
+        type="id"
+        name="detail_webBtn"/>
 </resources>

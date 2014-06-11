@@ -107,7 +107,11 @@ public class MainActivity extends Activity {
 		        	String description = (String) dataMap.get("description");
 		        	
 		        	System.out.println("Selected story was:  " + title + "  "  + date + "  " + description);
-		      
+		        	
+		        	//now that we have determined which story the user selected, load the detail view passing the data
+		        	Intent showDetail = new Intent(context, DetailView.class);
+		        	showDetail.putExtra("data", dataMap);
+		        	startActivityForResult(showDetail, 0);
 		        }
 		    });
 		} else {		
@@ -461,7 +465,7 @@ public class MainActivity extends Activity {
 			Log.e("DISPLAY_DATA", "Error parsing JSON from saved data!");
 		}
 	}
-	
+	//make sure to grab our retrieved data in the event our activity is destroyed, so we don't have to redownload it all again
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		//save the tableView's data so we don't use pull down redundant data again
@@ -469,6 +473,17 @@ public class MainActivity extends Activity {
 		savedInstanceState.putSerializable("saved", (Serializable) list);
 		
 		super.onSaveInstanceState(savedInstanceState);
+	}
+	
+	//get returned data when the detailView is destroyed
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		//check to make sure our detailView exited successfully, and then get the returned data
+		if (resultCode == RESULT_OK && requestCode == 0)
+		{
+			
+		}
+		
 	}
 	
 }

@@ -347,7 +347,9 @@ public class MainActivity extends Activity {
 				try {
 					//try to get the url as a string so we can let the user access the ESPN webpage in the detailView
 					JSONObject allLinks = storyObject.getJSONObject("links");
-					url = allLinks.getString("web");
+					JSONObject web = allLinks.getJSONObject("web");
+					url = web.getString("href");
+					//url = allLinks.getString("web");
 				} catch (Exception e) {
 					Log.i("DISPLAY_DATA"," Error retrieving URL for story");
 					url = "No link provided for this story.";

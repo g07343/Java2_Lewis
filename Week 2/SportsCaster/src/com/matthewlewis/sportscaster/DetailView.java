@@ -22,9 +22,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -37,6 +40,7 @@ public class DetailView extends Activity{
 	RatingBar ratingBar;
 	String imageUrl;
 	String title;
+	String storyUrl;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +54,7 @@ public class DetailView extends Activity{
 		String date = (String) storyData.get("date");
 		String description = (String) storyData.get("description");
 		imageUrl = (String) storyData.get("imageLink");
-		
+		storyUrl = (String) storyData.get("url");
 		//get our various views within our xml and assign our passed data
 		
 		storyImage = (ImageView) findViewById(R.id.detail_image);
@@ -76,6 +80,27 @@ public class DetailView extends Activity{
 			{//make sure that we had originally found a url for an image to begin with
 				DetailView.getImage getImage = new getImage();
 				getImage.execute();
+			}
+			
+			//check to make sure we were able to get a valid link to the story on ESPN
+			if (!storyUrl.equals("No link provided for this story."))
+			{
+				//set an onClickListener to the webBtn so that we can launch our implicit intent
+				webBtn.setOnClickListener(new OnClickListener(){
+					
+					@Override
+					public void onClick(View v) {
+						//use our web url to create an implicit intent so the user can visit the stories page on ESPN
+						System.out.println("URL was:  " + storyUrl);
+						
+						Uri webpage = Uri.parse(storyUrl);
+						Intent webIntent = new Intent(Intent.ACTION_VIEW, webpage);
+						startActivity(webIntent);
+					}
+					
+				});
+			} else {
+				webBtn.setEnabled(false);
 			}		
 			
 		} else {

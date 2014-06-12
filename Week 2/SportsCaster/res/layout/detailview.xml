@@ -38,12 +38,13 @@
 
             <ImageView
                 android:id="@id/detail_image"
-                android:layout_width="219dp"
+                android:layout_width="231dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
-                android:layout_weight="0.31"
+                android:layout_weight="0.25"
                 android:contentDescription="@string/detail_contentDesc"
+                android:minHeight="130dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/generic" />
 
@@ -74,15 +75,17 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="23dp"
+                android:layout_height="37dp"
                 android:layout_marginTop="10dp"
-                android:layout_weight="0.06"
+                android:layout_weight="0.10"
                 android:orientation="horizontal" >
 
                 <TextView
                     android:id="@+id/textView1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minHeight="20dp"
+                    android:paddingLeft="5dp"
                     android:text="@string/detail_shareLabel"
                     android:textColor="#FFF"
                     android:textStyle="bold" />
@@ -91,11 +94,12 @@
                     android:id="@id/detail_shareBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="37dp"
-                    android:layout_gravity="center"
                     android:layout_marginLeft="10dp"
+                    android:minHeight="50dip"
                     android:text="@string/detail_shareBtnLabel"
                     android:textColor="#FFF"
                     android:textStyle="bold" />
+
             </LinearLayout>
 
             <RatingBar

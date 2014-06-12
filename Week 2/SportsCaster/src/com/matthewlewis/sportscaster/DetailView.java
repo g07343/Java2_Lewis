@@ -70,15 +70,15 @@ public class DetailView extends Activity{
 		String description = (String) storyData.get("description");
 		imageUrl = (String) storyData.get("imageLink");
 		storyUrl = (String) storyData.get("url");
-		//get our various views within our xml and assign our passed data
 		
+		//get our various views within our xml and assign our passed data
 		storyImage = (ImageView) findViewById(R.id.detail_image);
 		webBtn = (Button) findViewById(R.id.detail_webBtn);
 		shareBtn = (Button) findViewById(R.id.detail_shareBtn);
 		ratingBar = (RatingBar) findViewById(R.id.detail_rating);
 		
 		
-		// check to see if we have a saved instance - if the view was destroyed, else set to the default
+		// check to see if we have a saved instance - if the view was destroyed, else set to the default image
 		if (savedInstanceState != null) {
 			image = (Bitmap) savedInstanceState.getParcelable("image");
 			if (image != null)

@@ -37,7 +37,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -56,7 +55,6 @@ public class MainActivity extends Activity {
 	private static TextView statusField;
 	public static Context context;
 	public static String fileName = "Stories.txt";
-	private static FileManager fileManager;
 	private static ListView listview;
 	static ArrayList<HashMap<String, Object>> list;
 	private View ratingAlert;
@@ -143,11 +141,9 @@ public class MainActivity extends Activity {
 			} else {
 				//no network connection, see if we have local data saved
 				Log.i("CONNECTION_CHECK", "No connection");
-				//get instance of FileManager singleton
-				fileManager = FileManager.GetInstance();
 				
-				//retrieve savedData to a string
-				String savedData = fileManager.readFile(context, fileName);
+				//retrieve savedData to a string using FileManager singleton
+				String savedData = FileManager.GetInstance().readFile(context, fileName);
 				
 				//check if savedData is valid, meaning we had a saved file from a previous session
 				if (savedData != null && !savedData.isEmpty()) {
@@ -269,7 +265,7 @@ public class MainActivity extends Activity {
 					//if the boolean is true, data was successfully saved and we can use it
 					if (response == true) {
 						//call the displayData function, which reads, formats, and displays the data to the user
-						displayData(null);
+						activity.displayData(null);
 					} else {
 						//boolean was false, there was an error saving the data.  Alert user
 						statusField.setText("Error retrieving data!");
@@ -287,15 +283,12 @@ public class MainActivity extends Activity {
 	 * Get this data, and parse it for the information we want before displaying it to the user.  This method needs 
 	 * try/catch blocks around nearly every JSON operation due to ESPN's inconsistency with their responses
 	 */
-	public static void displayData(ArrayList<HashMap<String, Object>> data) {
+	public void displayData(ArrayList<HashMap<String, Object>> data) {
 		//hide our statusField now that we are showing data 
 		statusField.setVisibility(View.GONE);
 		
-		//get instance of FileManger singleton
-		fileManager = FileManager.GetInstance();
-		
-		//retrieve stored data using FileManager
-		String rawData = fileManager.readFile(context, fileName);
+		//retrieve stored data using FileManager singleton
+		String rawData = FileManager.GetInstance().readFile(context, fileName);
 		
 		if (data != null)
 		{

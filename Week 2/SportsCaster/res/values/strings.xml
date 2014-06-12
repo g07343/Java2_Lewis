@@ -3,6 +3,7 @@
 
     <string name="app_name">SportsCaster</string>
     <string name="detailView_name">Story Details</string>
+    <string name="mainActivity_storiesLabel">Top Sports Stories:</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 	<string name="default_warning">Default warning</string>

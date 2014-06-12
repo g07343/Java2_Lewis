@@ -33,12 +33,22 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:text="@string/mainActivity_storiesLabel"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
     <ListView
         android:id="@id/list"
-        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
         android:divider="#235887" >
+
     </ListView>
 
 </LinearLayout>

@@ -25,6 +25,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -71,6 +72,7 @@ public class DetailView extends Activity{
 		
 		TextView descriptionView = (TextView) findViewById(R.id.detail_description);
 		descriptionView.setText(description);
+		descriptionView.setMovementMethod(new ScrollingMovementMethod());
 		
 		//need to make sure we have internet or else we don't want to load the story's image or enable the web link button
 		NetworkManager manager = new NetworkManager();

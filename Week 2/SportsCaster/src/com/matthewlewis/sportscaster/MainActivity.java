@@ -569,7 +569,7 @@ public class MainActivity extends Activity {
 		builder.setView(ratingAlert);
 		
 		
-		
+		//create a button to dismiss the alert and tell it what to do when tapped
 		builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
 			
 			@Override

@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -27,6 +29,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -50,11 +53,18 @@ public class DetailView extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.detailview);
 		
+		//add a nice back button using built-in functionality rather than trying to cram in more UI
+		ActionBar actionBar = getActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(true);
 		
-		
+		//grab our intent and bundle for our info
 		Bundle data = getIntent().getExtras();
 		@SuppressWarnings("unchecked")
+		
+		//get our passed hashmap
 		HashMap<String, Object> storyData = (HashMap<String, Object>) data.get("data");
+		
+		//grab our individual bits of data to apply to the UI
 		title = (String) storyData.get("headline");
 		String date = (String) storyData.get("date");
 		String description = (String) storyData.get("description");
@@ -204,6 +214,12 @@ public class DetailView extends Activity{
 		data.putExtra("rating", intRating);
 		setResult(RESULT_OK, data);
 		super.finish();
+	}
+	
+	//the below function simply detects when the user returns to the MainActivity using the back button in the ActionBar
+	public boolean onOptionsItemSelected(MenuItem item) {
+		this.finish();
+		return true;
 	}
 	
 	//make sure to save any data (especially our downloaded picture) for when the view gets destroyed to avoid redownloading it

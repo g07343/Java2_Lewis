@@ -14,6 +14,7 @@
 package com.matthewlewis.sportscaster;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -43,11 +45,14 @@ public class DetailView extends Activity{
 	String imageUrl;
 	String title;
 	String storyUrl;
+	Bitmap image;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.detailview);
+		
+		
 		
 		Bundle data = getIntent().getExtras();
 		@SuppressWarnings("unchecked")
@@ -64,6 +69,23 @@ public class DetailView extends Activity{
 		shareBtn = (Button) findViewById(R.id.detail_shareBtn);
 		ratingBar = (RatingBar) findViewById(R.id.detail_rating);
 		
+		
+		// check to see if we have a saved instance - if the view was destroyed, else set to the default
+		if (savedInstanceState != null) {
+			image = (Bitmap) savedInstanceState.getParcelable("image");
+			if (image != null)
+			{
+				storyImage.setImageBitmap(image);
+			} else {
+				Drawable defaultImage = getResources().getDrawable(R.drawable.generic);
+				storyImage.setImageDrawable(defaultImage);
+			}
+			
+		} else {
+			Drawable defaultImage = getResources().getDrawable(R.drawable.generic);
+			storyImage.setImageDrawable(defaultImage);
+		}
+				
 		TextView titleView = (TextView) findViewById(R.id.detail_title);
 		titleView.setText(title);
 		
@@ -79,12 +101,19 @@ public class DetailView extends Activity{
 		Boolean isConnected = manager.connectionStatus(getBaseContext());
 		if (isConnected)
 		{  
-			//we have internet currently, so get the image to replace the default one using internal async class
-			if (imageUrl != null)
-			{//make sure that we had originally found a url for an image to begin with
-				DetailView.getImage getImage = new getImage();
-				getImage.execute();
+			//check to make sure we don't already have the image (from before the view was destroyed)
+			if (image == null)
+			{
+				//we have internet currently, so get the image to replace the default one using internal async class
+				if (imageUrl != null)
+				{//make sure that we had originally found a url for an image to begin with
+					DetailView.getImage getImage = new getImage();
+					getImage.execute();
+				}
+			} else {
+				storyImage.setImageBitmap(image);
 			}
+			
 			
 			//check to make sure we were able to get a valid link to the story on ESPN
 			if (!storyUrl.equals("No link provided for this story."))
@@ -133,7 +162,6 @@ public class DetailView extends Activity{
 	
 	//use an async class to get our image from the url
 	public class getImage extends AsyncTask<String, Void, String> {
-		Bitmap image;
 		@Override
 		protected String doInBackground(String... params) {
 			// TODO Auto-generated method stub
@@ -179,4 +207,16 @@ public class DetailView extends Activity{
 		setResult(RESULT_OK, data);
 		super.finish();
 	}
+	
+	//make sure to save any data (especially our downloaded picture) for when the view gets destroyed to avoid redownloading it
+		@Override
+		public void onSaveInstanceState(Bundle savedInstanceState) {
+			//save the image, even if it is null, meaning there was no internet connection originally
+			//we can check whether the image is null in the onCreate function and react accordingly
+			System.out.println("DETAILS VIEW DESTROYED!!!");
+			
+			savedInstanceState.putParcelable("image", image);
+			
+			super.onSaveInstanceState(savedInstanceState);
+		}
 }

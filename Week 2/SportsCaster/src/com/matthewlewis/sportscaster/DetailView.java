@@ -82,18 +82,21 @@ public class DetailView extends Activity{
 		if (savedInstanceState != null) {
 			image = (Bitmap) savedInstanceState.getParcelable("image");
 			if (image != null)
-			{
+			{  //view was destroyed previously so set saved image
 				storyImage.setImageBitmap(image);
 			} else {
+				//no image was saved, so load the default image instead
 				Drawable defaultImage = getResources().getDrawable(R.drawable.generic);
 				storyImage.setImageDrawable(defaultImage);
 			}
 			
 		} else {
+			//no savedInstanceState, so load the default image
 			Drawable defaultImage = getResources().getDrawable(R.drawable.generic);
 			storyImage.setImageDrawable(defaultImage);
 		}
-				
+		
+		//grab our various textViews and set their data from the Intent
 		TextView titleView = (TextView) findViewById(R.id.detail_title);
 		titleView.setText(title);
 		
@@ -119,6 +122,7 @@ public class DetailView extends Activity{
 					getImage.execute();
 				}
 			} else {
+				//since we still have the image from before, load that
 				storyImage.setImageBitmap(image);
 			}
 			
@@ -149,7 +153,11 @@ public class DetailView extends Activity{
 						//set up our intent to allow the user to share the story
 						Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 						emailIntent.setType("plain/text");
+						
+						//set a body for the email, in this case, the link to the story
 						emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, storyUrl);
+						
+						//set a title for the email
 						emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Check out this awesome sports story I found with SportsCaster!");
 						startActivity(emailIntent);
 					}
@@ -157,6 +165,7 @@ public class DetailView extends Activity{
 				});
 				
 			} else {
+				//since MainActivity was unable to find a link for this story, disable these buttons
 				webBtn.setEnabled(false);
 				shareBtn.setEnabled(false);
 			}		
@@ -190,6 +199,7 @@ public class DetailView extends Activity{
 		
 		@Override
 		protected void onPostExecute(String s) {
+			//verify we actually got the image and if so, set to the imageView
 			if (image != null)
 			{
 				storyImage.setImageBitmap(image);
@@ -198,13 +208,14 @@ public class DetailView extends Activity{
 	
 	}
 	
+	//override the default "back button" method to allow us to detect it and go back to MainActivity
 	@Override
 	public void onBackPressed() {
 		System.out.println("Back button pressed!");
 		this.finish();
 	}
 	
-	//call this function when we have signaled the activity is done, and pass the rating back to MainActivity
+	//call this function when we have signaled the activity is done, and pass the rating and title back to MainActivity
 	@Override
 	public void finish() {
 		Intent data = new Intent();
@@ -222,7 +233,9 @@ public class DetailView extends Activity{
 		return true;
 	}
 	
-	//make sure to save any data (especially our downloaded picture) for when the view gets destroyed to avoid redownloading it
+	//make sure to save our image for when the view gets destroyed to avoid redownloading it.
+	//Since the activity by default holds onto the intent it was passed, we don't need to save the other data, since we would simply 
+	//be reloading it in the same way.
 		@Override
 		public void onSaveInstanceState(Bundle savedInstanceState) {
 			//save the image, even if it is null, meaning there was no internet connection originally

@@ -510,9 +510,7 @@ public class MainActivity extends Activity {
 			}
 			ratingDialog.dismiss();
 		}
-		
-		
-		
+			
 		//also, check to see if our ratingAlert is on-screen at this moment and if so, capture its data to restore
 		if (alertTitle != null)
 		{

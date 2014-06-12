@@ -59,12 +59,16 @@ public class MainActivity extends Activity {
 	private static FileManager fileManager;
 	private static ListView listview;
 	static ArrayList<HashMap<String, Object>> list;
+	private View ratingAlert;
+	private String alertTitle;
+	private int alertInt;
+	private AlertDialog ratingDialog;
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+	
 		setContentView(R.layout.activity_main);
 		//set our public variable context, so outside classes can access it if needed
 		context = this;
@@ -119,6 +123,17 @@ public class MainActivity extends Activity {
 		        	startActivityForResult(showDetail, 0);
 		        }
 		    });
+			
+			//if our alert was showing before the view was destroyed, recreate it
+        	String oldTitle = savedInstanceState.getString("alertTitle");
+        	Integer oldRating = (int) savedInstanceState.getInt("alertInt");
+        	if (oldTitle != null)
+        	{
+        		System.out.println("Old title was:  " + oldTitle);
+        		System.out.println("Old rating was:  " + oldRating);
+        		createAlert(oldTitle, oldRating);
+        	}
+			
 		} else {		
 			//if we have network connection
 			if (connected) {
@@ -483,6 +498,38 @@ public class MainActivity extends Activity {
 		System.out.println("VIEW DESTROYED!!!");
 		savedInstanceState.putSerializable("saved", (Serializable) list);
 		
+		//make sure to dismiss our alert dialog if it's not null and grab our values
+		//there is strange behavior that after rotating the device twice, these values are lost for some reason, 
+		//so we grab them here to ensure we can save them
+		if (ratingDialog != null)
+		{
+			TextView alertTitleView = (TextView) ratingDialog.findViewById(R.id.ratingAlert_title);
+			if (alertTitleView != null)
+			{
+				if (!alertTitleView.getText().equals(""))
+				{
+					System.out.println("TextView was NOT empty");
+					alertTitle = (String) alertTitleView.getText();
+					RatingBar oldRating = (RatingBar) ratingDialog.findViewById(R.id.ratingAlert_rating);
+					float oldFloat = oldRating.getRating();
+					alertInt = (int)oldFloat;
+				}
+			}
+			ratingDialog.dismiss();
+		}
+		
+		
+		
+		//also, check to see if our ratingAlert is on-screen at this moment and if so, capture its data to restore
+		if (alertTitle != null)
+		{
+			System.out.println("AlertTitle was:  " + alertTitle);
+			savedInstanceState.putString("alertTitle", alertTitle);
+			savedInstanceState.putInt("alertInt", alertInt);
+			alertTitle = null;
+			alertInt = -1;
+		}
+		
 		super.onSaveInstanceState(savedInstanceState);
 	}
 	
@@ -493,43 +540,51 @@ public class MainActivity extends Activity {
 		if (resultCode == RESULT_OK && requestCode == 0)
 		{
 			Bundle result = data.getExtras();
-			int rating = (Integer) result.get("rating");
-			String title = (String) result.get("title");
-			System.out.println("Rating returned was:  " + rating);
+			alertInt = (Integer) result.get("rating");
+			alertTitle = (String) result.get("title");
+			System.out.println("Rating returned was:  " + alertInt);
+			//send our values to be created into an alertDialog (external method so we can reuse it within onCreate if necessary)
+			createAlert(alertTitle, alertInt);
 			
-			//create our alert dialog
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			
-			LayoutInflater inflater = this.getLayoutInflater();
-			
-			//get our alertView as a view object first so we can alter it's data
-			View ratingAlert = inflater.inflate(R.layout.ratingalert, null);
-			
-			//grab our rating view contained in it and set it to whatever was previously entered in DetailView
-			RatingBar previousRating = (RatingBar) ratingAlert.findViewById(R.id.ratingAlert_rating);
-			previousRating.setRating(rating);
-			
-			//grab our title textview and set it to the title of the story
-			TextView titleView = (TextView) ratingAlert.findViewById(R.id.ratingAlert_title);
-			titleView.setText(title);
-			builder.setView(ratingAlert);
-			
-			
-			
-			builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					// TODO Auto-generated method stub
-					dialog.dismiss();
-				}
-			});
-			
-			AlertDialog ratingDialog = builder.create();
-			
-			ratingDialog.show();
 		}
 		
+	}
+	//the below method creates our alertDialog dynamically using a string for the title and an int for the rating
+	public void createAlert(String title, Integer rating) {
+		//create our alert dialog
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		
+		LayoutInflater inflater = this.getLayoutInflater();
+		
+		//get our alertView as a view object first so we can alter it's data
+		ratingAlert = inflater.inflate(R.layout.ratingalert, null);
+		
+		//grab our rating view contained in it and set it to whatever was previously entered in DetailView
+		RatingBar previousRating = (RatingBar) ratingAlert.findViewById(R.id.ratingAlert_rating);
+		previousRating.setRating(rating);
+		
+		//grab our title textview and set it to the title of the story
+		TextView titleView = (TextView) ratingAlert.findViewById(R.id.ratingAlert_title);
+		titleView.setText(title);
+		builder.setView(ratingAlert);
+		
+		
+		
+		builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				dialog.dismiss();
+				
+				//need to set the dialog to null here manually to avoid its values being saved in the onSaveInstanceState method
+				ratingDialog = null;
+			}
+		});
+		
+		ratingDialog = builder.create();
+		
+		ratingDialog.show();
 	}
 	
 }

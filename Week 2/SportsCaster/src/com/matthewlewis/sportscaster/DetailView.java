@@ -14,11 +14,9 @@
 package com.matthewlewis.sportscaster;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -38,14 +36,14 @@ import android.widget.TextView;
 
 public class DetailView extends Activity{
 	
-	ImageView storyImage;
-	Button webBtn;
-	Button shareBtn;
-	RatingBar ratingBar;
-	String imageUrl;
-	String title;
-	String storyUrl;
-	Bitmap image;
+	private ImageView storyImage;
+	private Button webBtn;
+	private Button shareBtn;
+	private RatingBar ratingBar;
+	private String imageUrl;
+	private String title;
+	private String storyUrl;
+	private Bitmap image;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

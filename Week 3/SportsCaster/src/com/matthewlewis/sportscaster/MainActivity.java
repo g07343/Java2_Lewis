@@ -106,19 +106,7 @@ public class MainActivity extends Activity {
 			listview.setOnItemClickListener(new OnItemClickListener() {
 		        public void onItemClick(AdapterView<?> parent, View view,
 		                int position, long id) {
-		        	//convert the selected int to a position relative to our hashmap array
-		        	int actualSelected = position -=1;
-		        	HashMap<String, Object> dataMap = list.get(actualSelected);
-		        	String title = (String) dataMap.get("headline");
-		        	String date = (String) dataMap.get("date");
-		        	String description = (String) dataMap.get("description");
-		        	
-		        	System.out.println("Selected story was:  " + title + "  "  + date + "  " + description);
-		        	
-		        	//now that we have determined which story the user selected, load the detail view passing the data
-		        	Intent showDetail = new Intent(context, DetailView.class);
-		        	showDetail.putExtra("data", dataMap);
-		        	startActivityForResult(showDetail, 0);
+		        	startResultActivity(position);
 		        }
 		    });
 			
@@ -463,19 +451,7 @@ public class MainActivity extends Activity {
 			listview.setOnItemClickListener(new OnItemClickListener() {
 		        public void onItemClick(AdapterView<?> parent, View view,
 		                int position, long id) {
-		        	//convert the selected int to a position relative to our hashmap array
-		        	int actualSelected = position -=1;
-		        	HashMap<String, Object> dataMap = list.get(actualSelected);
-		        	String title = (String) dataMap.get("headline");
-		        	String date = (String) dataMap.get("date");
-		        	String description = (String) dataMap.get("description");
-		        	
-		        	System.out.println("Selected story was:  " + title + "  "  + date + "  " + description);
-		        	//now that we have determined which story the user selected, load the detail view passing the data
-		        	Intent showDetail = new Intent(context, DetailView.class);
-		        	showDetail.putExtra("data", dataMap);
-		        	
-		        	((Activity) context).startActivityForResult(showDetail, 0);
+		        	startResultActivity(position);
 		        }
 		    });
 
@@ -576,6 +552,22 @@ public class MainActivity extends Activity {
 		ratingDialog = builder.create();
 		
 		ratingDialog.show();
+	}
+	
+	public void startResultActivity(int position) {
+		//convert the selected int to a position relative to our hashmap array
+    	int actualSelected = position -=1;
+    	HashMap<String, Object> dataMap = list.get(actualSelected);
+    	String title = (String) dataMap.get("headline");
+    	String date = (String) dataMap.get("date");
+    	String description = (String) dataMap.get("description");
+    	
+    	System.out.println("Selected story was:  " + title + "  "  + date + "  " + description);
+    	//now that we have determined which story the user selected, load the detail view passing the data
+    	Intent showDetail = new Intent(context, DetailView.class);
+    	showDetail.putExtra("data", dataMap);
+    	
+    	((Activity) context).startActivityForResult(showDetail, 0);
 	}
 	
 }

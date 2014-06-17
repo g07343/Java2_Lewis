@@ -77,6 +77,7 @@ public class DetailView extends Activity{
 		shareBtn = (Button) findViewById(R.id.detail_shareBtn);
 		ratingBar = (RatingBar) findViewById(R.id.detail_rating);
 		
+		displayDetails(title, date, description, imageUrl, storyUrl);
 		
 		// check to see if we have a saved instance - if the view was destroyed, else set to the default image
 		if (savedInstanceState != null) {
@@ -96,85 +97,7 @@ public class DetailView extends Activity{
 			storyImage.setImageDrawable(defaultImage);
 		}
 		
-		//grab our various textViews and set their data from the Intent
-		TextView titleView = (TextView) findViewById(R.id.detail_title);
-		titleView.setText(title);
 		
-		TextView dateView = (TextView) findViewById(R.id.detail_date);
-		dateView.setText(date);
-		
-		TextView descriptionView = (TextView) findViewById(R.id.detail_description);
-		descriptionView.setText(description);
-		descriptionView.setMovementMethod(new ScrollingMovementMethod());
-		
-		//need to make sure we have internet or else we don't want to load the story's image or enable the web link button
-		NetworkManager manager = new NetworkManager();
-		Boolean isConnected = manager.connectionStatus(getBaseContext());
-		if (isConnected)
-		{  
-			//check to make sure we don't already have the image (from before the view was destroyed)
-			if (image == null)
-			{
-				//we have internet currently, so get the image to replace the default one using internal async class
-				if (imageUrl != null)
-				{//make sure that we had originally found a url for an image to begin with
-					DetailView.getImage getImage = new getImage();
-					getImage.execute();
-				}
-			} else {
-				//since we still have the image from before, load that
-				storyImage.setImageBitmap(image);
-			}
-			
-			
-			//check to make sure we were able to get a valid link to the story on ESPN
-			if (!storyUrl.equals("No link provided for this story."))
-			{
-				//set an onClickListener to the webBtn so that we can launch our implicit intent
-				webBtn.setOnClickListener(new OnClickListener(){
-					
-					@Override
-					public void onClick(View v) {
-						//use our web url to create an implicit intent so the user can visit the stories page on ESPN
-						System.out.println("URL was:  " + storyUrl);
-						
-						Uri webpage = Uri.parse(storyUrl);
-						Intent webIntent = new Intent(Intent.ACTION_VIEW, webpage);
-						startActivity(webIntent);
-					}
-					
-				});
-				
-				//also set up an implicit intent to allow the user to share the story
-				shareBtn.setOnClickListener(new OnClickListener(){
-
-					@Override
-					public void onClick(View v) {
-						//set up our intent to allow the user to share the story
-						Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-						emailIntent.setType("plain/text");
-						
-						//set a body for the email, in this case, the link to the story
-						emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, storyUrl);
-						
-						//set a title for the email
-						emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Check out this awesome sports story I found with SportsCaster!");
-						startActivity(emailIntent);
-					}
-					
-				});
-				
-			} else {
-				//since MainActivity was unable to find a link for this story, disable these buttons
-				webBtn.setEnabled(false);
-				shareBtn.setEnabled(false);
-			}		
-			
-		} else {
-			//no internet, so leave the default image in place, and disable the web button
-			webBtn.setEnabled(false);
-			shareBtn.setEnabled(false);
-		}
 	}
 	
 	//use an async class to get our image from the url
@@ -245,5 +168,88 @@ public class DetailView extends Activity{
 			savedInstanceState.putParcelable("image", image);
 			
 			super.onSaveInstanceState(savedInstanceState);
+		}
+		
+		
+		public void displayDetails(String storyTitle, String storyDate, String storyDescription, String imageLink, final String storyLink) {
+			//grab our various textViews and set their data from the Intent
+			TextView titleView = (TextView) findViewById(R.id.detail_title);
+			titleView.setText(storyTitle);
+			
+			TextView dateView = (TextView) findViewById(R.id.detail_date);
+			dateView.setText(storyDate);
+			
+			TextView descriptionView = (TextView) findViewById(R.id.detail_description);
+			descriptionView.setText(storyDescription);
+			descriptionView.setMovementMethod(new ScrollingMovementMethod());
+			
+			//need to make sure we have internet or else we don't want to load the story's image or enable the web link button
+			NetworkManager manager = new NetworkManager();
+			Boolean isConnected = manager.connectionStatus(getBaseContext());
+			if (isConnected)
+			{  
+				//check to make sure we don't already have the image (from before the view was destroyed)
+				if (image == null)
+				{
+					//we have internet currently, so get the image to replace the default one using internal async class
+					if (imageLink != null)
+					{//make sure that we had originally found a url for an image to begin with
+						DetailView.getImage getImage = new getImage();
+						getImage.execute();
+					}
+				} else {
+					//since we still have the image from before, load that
+					storyImage.setImageBitmap(image);
+				}
+				
+				
+				//check to make sure we were able to get a valid link to the story on ESPN
+				if (!storyLink.equals("No link provided for this story."))
+				{
+					//set an onClickListener to the webBtn so that we can launch our implicit intent
+					webBtn.setOnClickListener(new OnClickListener(){
+						
+						@Override
+						public void onClick(View v) {
+							//use our web url to create an implicit intent so the user can visit the stories page on ESPN
+							System.out.println("URL was:  " + storyLink);
+							
+							Uri webpage = Uri.parse(storyLink);
+							Intent webIntent = new Intent(Intent.ACTION_VIEW, webpage);
+							startActivity(webIntent);
+						}
+						
+					});
+					
+					//also set up an implicit intent to allow the user to share the story
+					shareBtn.setOnClickListener(new OnClickListener(){
+
+						@Override
+						public void onClick(View v) {
+							//set up our intent to allow the user to share the story
+							Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+							emailIntent.setType("plain/text");
+							
+							//set a body for the email, in this case, the link to the story
+							emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, storyLink);
+							
+							//set a title for the email
+							emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Check out this awesome sports story I found with SportsCaster!");
+							startActivity(emailIntent);
+						}
+						
+					});
+					
+				} else {
+					//since MainActivity was unable to find a link for this story, disable these buttons
+					webBtn.setEnabled(false);
+					shareBtn.setEnabled(false);
+				}		
+				
+			} else {
+				//no internet, so leave the default image in place, and disable the web button
+				webBtn.setEnabled(false);
+				shareBtn.setEnabled(false);
+			}
 		}
 }

@@ -36,13 +36,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
-import android.widget.ListView;
 import android.widget.RatingBar;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,7 +46,6 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 
 	//declare class variables
 	private static String apiURL = "http://api.espn.com/v1/now/popular?limit=10&apikey=q82zaw4uydmpw6ccfcgh8ze2";
-	private static TextView statusField;
 	public static Context context;
 	public static String fileName = "Stories.txt";
 	static ArrayList<HashMap<String, Object>> list;
@@ -60,7 +53,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	private String alertTitle;
 	private int alertInt;
 	private AlertDialog ratingDialog;
-	Button reloadBtn;
+	MainActivityFragment mainFragment;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -70,29 +63,23 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		setContentView(R.layout.fragment_main);
 		//set our public variable context, so outside classes can access it if needed
 		context = this;
-		//grab our text field in charge of communicating to the user
-		statusField = (TextView) findViewById(R.id.internet_warning);
+		
+		//set up our reference to the MainActivityFragment so we can use it to call methods when needed
+		mainFragment = (MainActivityFragment) getFragmentManager().findFragmentById(R.id.fragment1);
 		
 		//create instance of NetworkManager class to check Internet connection
 		final NetworkManager manager = new NetworkManager();
 		
-		reloadBtn = (Button) findViewById(R.id.reload_btn);
 		
 		//use our instance of Network Manager to determine our current connectivity
 		Boolean connected = manager.connectionStatus(this);
 		//set our button (only used for Re checking Internet) to "GONE" by default
-		reloadBtn.setVisibility(View.GONE);	
+			
 		
 		if (savedInstanceState != null )
 		{
-			statusField.setVisibility(View.GONE);
 			list = (ArrayList<HashMap<String, Object>>) savedInstanceState.getSerializable("saved");
-			SimpleAdapter adapter = new SimpleAdapter(context, list,
-					R.layout.row, new String[] { (String) "headline",
-							(String) "date", "description", "icon" },
-					new int[] { R.id.title, R.id.date, R.id.description,
-							R.id.sport_icon });
-			
+		
 			//set our adapter
 			applyAdapter(context, list);
 			
@@ -122,9 +109,6 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 				//check if savedData is valid, meaning we had a saved file from a previous session
 				if (savedData != null && !savedData.isEmpty()) {
 					
-					//hide our statusField since we no longer need it
-					statusField.setVisibility(View.GONE);
-					
 					//let user know they are viewing old data due to lack of Internet connection
 					Toast.makeText(getApplicationContext(),
 							"No Internet Connection.  Displaying old stories.",
@@ -133,25 +117,8 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 					//now that we have verified old data exists, call method to display it to the user
 					displayData(null);
 				} else {
-					//no Internet or saved data, alert user they need Internet!
-					statusField.setText("No internet! Please check your internet connection.");
-					
-					//display our button, which rechecks Internet
-					reloadBtn.setVisibility(View.VISIBLE);
-					
-					//set onClick listener to check for a change in Internet connectivity
-					reloadBtn.setOnClickListener(new OnClickListener() {
-						public void onClick(View v) {
-							// Re check our Internet connection
-							Boolean connected = manager.connectionStatus(context);
-							if (connected) {
-								//hide our button now, since we no longer need it
-								reloadBtn.setVisibility(View.GONE);
-								//now that we have Internet, get data
-								startRetrieval();
-							}
-						}
-					});
+					//we have no internet connection and no local storage, so alert the fragment via interface method
+					updateStatus(null);
 				}
 
 			}
@@ -180,7 +147,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		context.startService(startApiService);
 		
 		//let the user know that data is being retrieved
-		statusField.setText("Getting data...");
+		updateStatus("Getting data...");
 	}
 
 	
@@ -242,11 +209,11 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 						activity.displayData(null);
 					} else {
 						//boolean was false, there was an error saving the data.  Alert user
-						statusField.setText("Error retrieving data!");
+						activity.updateStatus("Error retrieving data!");
 					}
 				} else {
 					//boolean was false, there was an error saving the data.  Alert user
-					statusField.setText("Error retrieving data!");
+					activity.updateStatus("Error retrieving data!");
 				}
 			}
 		}
@@ -259,7 +226,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	 */
 	public void displayData(ArrayList<HashMap<String, Object>> data) {
 		//hide our statusField now that we are showing data 
-		statusField.setVisibility(View.GONE);
+		//statusField.setVisibility(View.GONE);
 		
 		//retrieve stored data using FileManager singleton
 		String rawData = FileManager.GetInstance().readFile(context, fileName);
@@ -520,7 +487,6 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	
 	@Override
 	public void startDetailsActivity(int position) {
-		System.out.println("Parent startDetailsActivity runs via fragment!");
 		//convert the selected int to a position relative to our hashmap array
     	int actualSelected = position -=1;
     	HashMap<String, Object> dataMap = list.get(actualSelected);
@@ -536,13 +502,25 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
     	startActivityForResult(showDetail, 0);
 	}
 	
-
+//using this method, we can send the data for our listview to our fragment to apply
 	@Override
 	public void applyAdapter(Context context,
 			ArrayList<HashMap<String, Object>> list) {
-		
-		MainActivityFragment fragment = (MainActivityFragment) getFragmentManager().findFragmentById(R.id.fragment1);
-		fragment.setData(context, list);
+		mainFragment.setData(context, list);
+	}
+
+	//this method lets us communicate to the MainActivityFragment that we don't have internet.
+	//The correct interface is then displayed from within the fragment, rather than applying it from here.
+	//if we send this method a string, it applies it to the "StatusText" to update the user, otherwise, it's no internet
+	@Override
+	public void updateStatus(String status) {
+		if (status != null)
+		{//if we received an actual string as an argument, pass to fragment to display in the StatusText field
+			mainFragment.toggleStatusUI(status);
+		} else {
+			//otherwise, we didn't receive a valid string, meaning we have no internet connection
+			mainFragment.toggleStatusUI(null);
+		}
 	}
 	
 }

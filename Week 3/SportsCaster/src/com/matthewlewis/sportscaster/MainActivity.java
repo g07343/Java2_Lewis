@@ -48,7 +48,7 @@ import android.widget.Toast;
 
 import com.matthewlewis.sportscaster.NetworkManager;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements MainActivityFragment.mainFragmentInterface{
 
 	//declare class variables
 	private static String apiURL = "http://api.espn.com/v1/now/popular?limit=10&apikey=q82zaw4uydmpw6ccfcgh8ze2";
@@ -61,13 +61,14 @@ public class MainActivity extends Activity {
 	private String alertTitle;
 	private int alertInt;
 	private AlertDialog ratingDialog;
+	Button reloadBtn;
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.fragment_main);
 		//set our public variable context, so outside classes can access it if needed
 		context = this;
 		//grab our text field in charge of communicating to the user
@@ -76,7 +77,7 @@ public class MainActivity extends Activity {
 		//create instance of NetworkManager class to check Internet connection
 		final NetworkManager manager = new NetworkManager();
 		
-		final Button reloadBtn = (Button) findViewById(R.id.reload_btn);
+		reloadBtn = (Button) findViewById(R.id.reload_btn);
 		
 		//use our instance of Network Manager to determine our current connectivity
 		Boolean connected = manager.connectionStatus(this);
@@ -101,14 +102,7 @@ public class MainActivity extends Activity {
 							R.id.sport_icon });
 			
 			//set our adapter
-			listview.setAdapter(adapter);
-			//set our onClick listener for our listView
-			listview.setOnItemClickListener(new OnItemClickListener() {
-		        public void onItemClick(AdapterView<?> parent, View view,
-		                int position, long id) {
-		        	startResultActivity(position);
-		        }
-		    });
+			applyAdapter(context, list);
 			
 			//if our alert was showing before the view was destroyed, recreate it
         	String oldTitle = savedInstanceState.getString("alertTitle");
@@ -178,7 +172,7 @@ public class MainActivity extends Activity {
 	 */
 	public void startRetrieval() {
 		//create a Handler object based on the subclass below
-		final ApiHandler apiHandler = new ApiHandler(this);
+		final ApiHandler apiHandler = new ApiHandler(context);
 		
 		//create a messenger object to communicate back and forth
 		Messenger apiMessenger = new Messenger(apiHandler);
@@ -191,7 +185,7 @@ public class MainActivity extends Activity {
 		startApiService.putExtra(APIService.API_KEY, apiURL);
 		
 		//Start the service, passing the intent
-		startService(startApiService);
+		context.startService(startApiService);
 		
 		//let the user know that data is being retrieved
 		statusField.setText("Getting data...");
@@ -229,10 +223,10 @@ public class MainActivity extends Activity {
 		/**
 		 * Instantiates a new api handler.
 		 *
-		 * @param activity the activity
+		 * @param context the activity
 		 */
-		public ApiHandler(MainActivity activity) {
-			mActivity = new WeakReference<MainActivity>(activity);
+		public ApiHandler(Context context) {
+			mActivity = new WeakReference<MainActivity>((MainActivity) context);
 		}
 
 		/* 
@@ -282,14 +276,7 @@ public class MainActivity extends Activity {
 		{
 			list = data;
 			//create a SimpleAdapter in conjunction with the above created data
-			SimpleAdapter adapter = new SimpleAdapter(context, list,
-					R.layout.row, new String[] { (String) "headline",
-							(String) "date", "description", "icon" },
-					new int[] { R.id.title, R.id.date, R.id.description,
-							R.id.sport_icon });
-			
-			//set our adapter
-			listview.setAdapter(adapter);
+			applyAdapter(context, list);
 		} else {
 			//convert to an arrayList of HashMaps, which contain objects
 			list = new ArrayList<HashMap<String, Object>>();
@@ -437,23 +424,8 @@ public class MainActivity extends Activity {
 				//finally, add the above HashMap to our ArrayList
 				list.add(dataMap);
 			}
-			//create a SimpleAdapter in conjunction with the above created data
-			SimpleAdapter adapter = new SimpleAdapter(context, list,
-					R.layout.row, new String[] { (String) "headline",
-							(String) "date", "description", "icon" },
-					new int[] { R.id.title, R.id.date, R.id.description,
-							R.id.sport_icon });
 			
-			//set our adapter
-			listview.setAdapter(adapter);
-			
-			//set our onClick listener for our listView
-			listview.setOnItemClickListener(new OnItemClickListener() {
-		        public void onItemClick(AdapterView<?> parent, View view,
-		                int position, long id) {
-		        	startResultActivity(position);
-		        }
-		    });
+			applyAdapter(context, list);
 
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -554,7 +526,9 @@ public class MainActivity extends Activity {
 		ratingDialog.show();
 	}
 	
-	public void startResultActivity(int position) {
+	@Override
+	public void startDetailsActivity(int position) {
+		System.out.println("Parent startDetailsActivity runs via fragment!");
 		//convert the selected int to a position relative to our hashmap array
     	int actualSelected = position -=1;
     	HashMap<String, Object> dataMap = list.get(actualSelected);
@@ -567,7 +541,24 @@ public class MainActivity extends Activity {
     	Intent showDetail = new Intent(context, DetailView.class);
     	showDetail.putExtra("data", dataMap);
     	
-    	((Activity) context).startActivityForResult(showDetail, 0);
+    	startActivityForResult(showDetail, 0);
+	}
+	
+
+	@Override
+	public void applyAdapter(Context context,
+			ArrayList<HashMap<String, Object>> list) {
+		System.out.println("fragment applyAdapter method called on MainActivity side!");
+		// TODO Auto-generated method stub
+		SimpleAdapter adapter = new SimpleAdapter(context, list,
+				R.layout.row, new String[] { (String) "headline",
+						(String) "date", "description", "icon" },
+				new int[] { R.id.title, R.id.date, R.id.description,
+						R.id.sport_icon });
+		
+		//set our adapter
+		listview.setAdapter(adapter);
+		
 	}
 	
 }

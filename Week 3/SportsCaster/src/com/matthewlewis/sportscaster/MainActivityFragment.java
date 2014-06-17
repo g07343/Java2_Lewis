@@ -39,7 +39,7 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	Button reloadBtn;
 	
 	public interface mainFragmentInterface {
-		//void startResultActivity(int position, ArrayList<HashMap<String, Object>> list, Context context);
+		
 		void applyAdapter(Context context, ArrayList<HashMap<String, Object>> list);
 		void startDetailsActivity(int position);
 	}
@@ -69,6 +69,9 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 		statusField = (TextView) view.findViewById(R.id.internet_warning);
 		listview = (ListView) view.findViewById(R.id.list);
 		
+		View listHeader = inflater.inflate(R.layout.header,
+				null);
+		listview.addHeaderView(listHeader);
 		
 		
 		reloadBtn.setOnClickListener(this);
@@ -109,6 +112,18 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 		//set our adapter
 		listview.setAdapter(adapter);
 		
+	}
+	
+	public void setData(final Context context, final ArrayList<HashMap<String, Object>> list) {
+		//create a SimpleAdapter in conjunction with the above created data
+				SimpleAdapter adapter = new SimpleAdapter(context, list,
+						R.layout.row, new String[] { (String) "headline",
+								(String) "date", "description", "icon" },
+						new int[] { R.id.title, R.id.date, R.id.description,
+								R.id.sport_icon });
+				System.out.println("SetData method called on Fragment side!");
+				//set our adapter
+				listview.setAdapter(adapter);
 	}
 	
 	public void startResultActivity(int position, ArrayList<HashMap<String, Object>> list, Context context) {

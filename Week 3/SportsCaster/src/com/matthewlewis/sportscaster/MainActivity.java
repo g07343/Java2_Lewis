@@ -55,7 +55,6 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	private static TextView statusField;
 	public static Context context;
 	public static String fileName = "Stories.txt";
-	private static ListView listview;
 	static ArrayList<HashMap<String, Object>> list;
 	private View ratingAlert;
 	private String alertTitle;
@@ -82,14 +81,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		//use our instance of Network Manager to determine our current connectivity
 		Boolean connected = manager.connectionStatus(this);
 		//set our button (only used for Re checking Internet) to "GONE" by default
-		reloadBtn.setVisibility(View.GONE);
-		
-		//set up our list view and inflate our header view and then add it
-		listview = (ListView) findViewById(R.id.list);
-		View listHeader = this.getLayoutInflater().inflate(R.layout.header,
-				null);
-		listview.addHeaderView(listHeader);
-		
+		reloadBtn.setVisibility(View.GONE);	
 		
 		if (savedInstanceState != null )
 		{
@@ -548,17 +540,9 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	@Override
 	public void applyAdapter(Context context,
 			ArrayList<HashMap<String, Object>> list) {
-		System.out.println("fragment applyAdapter method called on MainActivity side!");
-		// TODO Auto-generated method stub
-		SimpleAdapter adapter = new SimpleAdapter(context, list,
-				R.layout.row, new String[] { (String) "headline",
-						(String) "date", "description", "icon" },
-				new int[] { R.id.title, R.id.date, R.id.description,
-						R.id.sport_icon });
 		
-		//set our adapter
-		listview.setAdapter(adapter);
-		
+		MainActivityFragment fragment = (MainActivityFragment) getFragmentManager().findFragmentById(R.id.fragment1);
+		fragment.setData(context, list);
 	}
 	
 }

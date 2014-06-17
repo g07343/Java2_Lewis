@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SportsCaster</string>
+    <string name="detailView_name">Story Details</string>
+    <string name="mainActivity_storiesLabel">Top Sports Stories:</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+	<string name="default_warning">Default warning</string>
+	<string name="title_text">Title (Black text)</string>
+	<string name="date_text">Date (Gray text)</string>
+	<string name="description_text">Description (White text)</string>
+	<string name="reloadBtn_text">Reload</string>
+	<string name="icon_text">Icon to represent a sport</string>
+	<string name="detail_title">Selected title</string>
+	<string name="detail_contentDesc">Image depicting related story</string>
+	<string name="detail_dateLabel">Posted on: </string>
+	<string name="detail_actualDate">dynamic date</string>
+	<string name="detail_description">dynamic description</string>
+	<string name="detail_webButton">View on ESPN</string>
+	<string name="ratingAlert_title">Dynamic Title</string>
+	<string name="ratingAlert_mainLabel">Rating was: </string>
+	<string name="detail_shareLabel">Like this story?</string>
+	<string name="detail_shareBtnLabel">Share it!</string>
+</resources>

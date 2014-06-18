@@ -19,6 +19,7 @@ import java.net.URL;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -85,6 +86,13 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 		descriptionView = (TextView) view.findViewById(R.id.detail_description);
 		ratingBar.setOnRatingBarChangeListener(this);
 
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+		{
+			descriptionView.setTextSize(14);
+		} else {
+			descriptionView.setTextSize(18);
+		}
+		
 		// check to see if we have a saved instance - if the view was destroyed, else set to the default image
 		if (savedInstanceState != null) {
 			image = (Bitmap) savedInstanceState.getParcelable("image");
@@ -107,6 +115,16 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 	}
 	
 	public void populateData(String storyTitle, String storyDate, String storyDescription, String imageUrlString, final String storyLink) {
+		
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+		{
+			descriptionView.setTextSize(14);
+		} else {
+			descriptionView.setTextSize(18);
+		}
+		//reset the rating whenever receiving new data
+		ratingBar.setRating(0);
+		
 		//set passed data to textViews
 		titleView.setText(storyTitle);
 		
@@ -238,6 +256,12 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 			//grab our current rating since the user changed it
 			int intRating = (int)rating;
 			parentActivity.setRating(intRating);
+		}
+		
+		//we use this function to manually "destroy" an old story's image when the user selects a new one in landscape
+		//in this way, the above logic within populateData() will retrieve the new story's image
+		public void clearImage() {
+			image = null;
 		}
 }
 

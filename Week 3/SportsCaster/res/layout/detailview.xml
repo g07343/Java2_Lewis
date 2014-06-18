@@ -109,12 +109,14 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 android:stepSize="1" />
-
+			
             <TextView
                 android:id="@id/detail_description"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="0.88"
+                android:height="100dp"
+                android:minHeight="70dp"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:scrollbars="vertical"

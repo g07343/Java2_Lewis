@@ -504,6 +504,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	    	String description = (String) dataMap.get("description");
 	    	String imageUrl = (String) dataMap.get("imageLink");
 	    	String url = (String) dataMap.get("url");
+	    	detailFragment.clearImage();
 	    	detailFragment.populateData(title, date, description, imageUrl, url);
 		} else {
 			//send the data to the DetailsActivity, since our second fragment hasn't been initialized

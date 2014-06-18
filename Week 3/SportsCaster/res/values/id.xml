@@ -51,4 +51,10 @@
     <item
         type="id"
         name="detail_shareBtn"/>
+    <item
+        type="id"
+        name="detail_fragment"/>
+    <item
+        type="id"
+        name="main_fragment"/>
 </resources>

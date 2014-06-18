@@ -65,7 +65,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		context = this;
 		
 		//set up our reference to the MainActivityFragment so we can use it to call methods when needed
-		mainFragment = (MainActivityFragment) getFragmentManager().findFragmentById(R.id.fragment1);
+		mainFragment = (MainActivityFragment) getFragmentManager().findFragmentById(R.id.main_fragment);
 		
 		//create instance of NetworkManager class to check Internet connection
 		final NetworkManager manager = new NetworkManager();

@@ -5,9 +5,9 @@
     android:orientation="vertical" >
 
     <fragment
-        android:id="@+id/main_fragment"
-        android:name="com.matthewlewis.sportscaster.MainActivityFragment"
+        android:id="@+id/detail_fragment"
+        android:name="com.matthewlewis.sportscaster.DetailViewFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-    
+
 </LinearLayout>

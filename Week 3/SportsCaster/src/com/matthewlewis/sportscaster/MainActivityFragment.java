@@ -40,7 +40,7 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	public interface mainFragmentInterface {
 		
 		void applyAdapter(Context context, ArrayList<HashMap<String, Object>> list);
-		void startDetailsActivity(int position);
+		void itemSelected(int position);
 		void updateStatus(String status);
 	}
 	
@@ -82,7 +82,7 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	                int position, long id) {
 	        	//call the interfaced method startDetailsActivity, and pass the selected number.  
 	        	//Since the parentActivity has the data already, no need to pass the data itself back.
-	        	parentActivity.startDetailsActivity(position);
+	        	parentActivity.itemSelected(position);
 	        }
 	    });
 		

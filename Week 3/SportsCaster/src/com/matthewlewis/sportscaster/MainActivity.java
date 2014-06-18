@@ -42,7 +42,8 @@ import android.widget.Toast;
 
 import com.matthewlewis.sportscaster.NetworkManager;
 
-public class MainActivity extends Activity implements MainActivityFragment.mainFragmentInterface{
+public class MainActivity extends Activity implements MainActivityFragment.mainFragmentInterface,
+	DetailViewFragment.detailsFragmentInterface{
 
 	//declare class variables
 	private static String apiURL = "http://api.espn.com/v1/now/popular?limit=10&apikey=q82zaw4uydmpw6ccfcgh8ze2";
@@ -486,20 +487,32 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	}
 	
 	@Override
-	public void startDetailsActivity(int position) {
-		//convert the selected int to a position relative to our hashmap array
-    	int actualSelected = position -=1;
-    	HashMap<String, Object> dataMap = list.get(actualSelected);
-    	String title = (String) dataMap.get("headline");
-    	String date = (String) dataMap.get("date");
-    	String description = (String) dataMap.get("description");
-    	
-    	System.out.println("Selected story was:  " + title + "  "  + date + "  " + description);
-    	//now that we have determined which story the user selected, load the detail view passing the data
-    	Intent showDetail = new Intent(context, DetailView.class);
-    	showDetail.putExtra("data", dataMap);
-    	
-    	startActivityForResult(showDetail, 0);
+	public void itemSelected(int position) {
+		//convert our position to the correct one chosen by the user
+		int actualSelected = position -=1;
+		
+		//grab the hashmap with our selected story's data
+		HashMap<String, Object> dataMap = list.get(actualSelected);
+		
+		//get an instance of the detailsViewFragment so we can check if it is valid
+		DetailViewFragment detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
+		
+		if (detailFragment != null && detailFragment.isInLayout())
+		{   	
+	    	String title = (String) dataMap.get("headline");
+	    	String date = (String) dataMap.get("date");
+	    	String description = (String) dataMap.get("description");
+	    	String imageUrl = (String) dataMap.get("imageLink");
+	    	String url = (String) dataMap.get("url");
+	    	detailFragment.populateData(title, date, description, imageUrl, url);
+		} else {
+			//send the data to the DetailsActivity, since our second fragment hasn't been initialized
+	    	Intent showDetail = new Intent(context, DetailView.class);
+	    	showDetail.putExtra("data", dataMap);
+	    	
+	    	startActivityForResult(showDetail, 0);
+		}
+		
 	}
 	
 //using this method, we can send the data for our listview to our fragment to apply
@@ -521,6 +534,19 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			//otherwise, we didn't receive a valid string, meaning we have no internet connection
 			mainFragment.toggleStatusUI(null);
 		}
+	}
+
+	@Override
+	public void displayDetails(String storyTitle, String storyDate,
+			String storyDescription, String imageLink, String storyLink) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setRating(int number) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

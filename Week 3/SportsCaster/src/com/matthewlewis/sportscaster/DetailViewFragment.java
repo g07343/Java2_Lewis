@@ -51,6 +51,9 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 	Bitmap image;
 	String imageUrl;
 	String title;
+	String date;
+	String description;
+	String storyUrl;
 	int rating;
 	LinearLayout layoutContainer;
 	
@@ -82,7 +85,7 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 		View view = inflater.inflate(R.layout.detailview, container);
 		
 		layoutContainer = (LinearLayout) view.findViewById(R.id.detail_container);
-		layoutContainer.setVisibility(View.GONE);
+		//layoutContainer.setVisibility(View.GONE);
 		storyImage = (ImageView) view.findViewById(R.id.detail_image);
 		webBtn = (Button) view.findViewById(R.id.detail_webBtn);
 		shareBtn = (Button) view.findViewById(R.id.detail_shareBtn);
@@ -104,6 +107,10 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 			image = (Bitmap) savedInstanceState.getParcelable("image");
 			title = (String) savedInstanceState.getString("title");
 			rating = (int) savedInstanceState.getInt("rating");
+			date = (String) savedInstanceState.getString("date");
+			description = (String) savedInstanceState.getString("description");
+			storyUrl = (String) savedInstanceState.getString("storyLink");
+			imageUrl = (String) savedInstanceState.getString("imageLink");
 			
 			if (image != null)
 			{  //view was destroyed previously so set saved image
@@ -140,6 +147,7 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 		dateView.setText(storyDate);
 		
 		descriptionView.setText(storyDescription);
+		description = storyDescription;
 		descriptionView.setMovementMethod(new ScrollingMovementMethod());
 		
 		imageUrl = imageUrlString;
@@ -166,7 +174,9 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 			
 			//check to make sure we were able to get a valid link to the story on ESPN
 			if (!storyLink.equals("No link provided for this story."))
-			{
+			{	//set our global string to the value passed so we can save it if needed
+				storyUrl = storyLink;
+				
 				//set an onClickListener to the webBtn so that we can launch our implicit intent
 				webBtn.setOnClickListener(new OnClickListener(){
 					
@@ -252,10 +262,15 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 			
 			String title = (String) titleView.getText();
 			int intRating = (int)ratingBar.getRating();
+			String date = (String) dateView.getText();
 			
 			//we need to save all of this data since we can't be sure if the view is being destroyed due to
 			//the user rotating the device or something else.  If rotating, we need the rating and title to 
 			//give to the parentActivity in order to send back for an alert dialog
+			savedInstanceState.putString("date", date);
+			savedInstanceState.putString("storyLink", storyUrl);
+			savedInstanceState.putString("imageLink", imageUrl);
+			savedInstanceState.putString("description", description);
 			savedInstanceState.putParcelable("image", image);
 			savedInstanceState.putString("title", title);
 			savedInstanceState.putInt("rating", intRating);
@@ -288,6 +303,10 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 			} else {
 				layoutContainer.setVisibility(View.GONE);
 			}
+		}
+		
+		public void setRating(int passedRating) {
+			ratingBar.setRating((float) passedRating);
 		}
 }
 

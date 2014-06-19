@@ -13,12 +13,13 @@
  */
 package com.matthewlewis.sportscaster;
 
-import java.util.HashMap;
 
+import java.util.HashMap;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -28,18 +29,17 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 	private String title;
 	private String storyUrl;
 	DetailViewFragment detailFragment;
+	String description;
+	String date;
 	int rating;
+	Bitmap image;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		
-		
+			
 		setContentView(R.layout.fragment_detail);
-		
-		
-		
+			
 		// set up our reference to the MainActivityFragment so we can use it to
 		// call methods when needed
 		detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
@@ -88,12 +88,24 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 	public void finish() {
 		Intent data = new Intent();
 		rating = (int) detailFragment.ratingBar.getRating();
+		//if title is equal to null at this point, then we know the phone has been rotated to landscape
+		//from the protrait view/single activity, so grab the data we need to repopulate the DetailViewFragment
 		if (title == null)
 		{
 			title = detailFragment.title;
 			rating = detailFragment.rating;
+			image = detailFragment.image;
+			date = detailFragment.date;
+			description = detailFragment.description;
+			storyUrl = detailFragment.storyUrl;
+			imageUrl = detailFragment.imageUrl;
+			data.putExtra("date", date);
+			data.putExtra("link", storyUrl);
+			data.putExtra("description", description);
+			data.putExtra("imageLink", imageUrl );
 		}
 		
+		//we only really need to pass the title and rating if the device is in portrait
 		data.putExtra("title", title);
 		data.putExtra("rating", rating);
 		setResult(RESULT_OK, data);

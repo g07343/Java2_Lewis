@@ -55,9 +55,15 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	static ArrayList<HashMap<String, Object>> list;
 	private View ratingAlert;
 	private String alertTitle;
+	private String savedImageUrl;
+	private String savedDescription;
+	private String savedTitle;
+	private String savedDate;
+	private String savedStoryUrl;
 	private int alertInt;
 	private AlertDialog ratingDialog;
 	MainActivityFragment mainFragment;
+	DetailViewFragment detailFragment;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -71,30 +77,47 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		//set up our reference to the MainActivityFragment so we can use it to call methods when needed
 		mainFragment = (MainActivityFragment) getFragmentManager().findFragmentById(R.id.main_fragment);
 		
+		//set up a reference to the DetailViewFragment if we need it
+		detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
+		
 		//create instance of NetworkManager class to check Internet connection
 		final NetworkManager manager = new NetworkManager();
 		
 		
 		//use our instance of Network Manager to determine our current connectivity
 		Boolean connected = manager.connectionStatus(this);
-		//set our button (only used for Re checking Internet) to "GONE" by default
-			
 		
+			
+		//check for a saved instance and get data if we have one
 		if (savedInstanceState != null )
 		{
 			list = (ArrayList<HashMap<String, Object>>) savedInstanceState.getSerializable("saved");
 		
-			//set our adapter
+			//set our adapter within our fragment via interface
 			applyAdapter(context, list);
 			
 			//if our alert was showing before the view was destroyed, recreate it
         	String oldTitle = savedInstanceState.getString("alertTitle");
         	Integer oldRating = (int) savedInstanceState.getInt("alertInt");
+        	savedDescription = savedInstanceState.getString("description");
         	if (oldTitle != null && !(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE))
         	{
         		System.out.println("Old title was:  " + oldTitle);
         		System.out.println("Old rating was:  " + oldRating);
         		createAlert(oldTitle, oldRating);
+        		
+        	}
+        	if (savedDescription != null)
+        	{
+        		savedImageUrl = savedInstanceState.getString("imageLink");
+        		savedDate = savedInstanceState.getString("date");
+        		savedStoryUrl = savedInstanceState.getString("link");
+        		savedTitle = savedInstanceState.getString("title");
+        		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+        		{
+        			detailFragment.populateData(savedTitle, savedDate, savedDescription, savedImageUrl, savedStoryUrl);
+        		}
+        		
         	}
 			
 		} else {		
@@ -422,6 +445,16 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			ratingDialog.dismiss();
 		}
 			
+		
+		//check to see if we have a saved value for description and if so, save it
+		if (savedDescription != null) {
+			savedInstanceState.putString("description", savedDescription);
+			savedInstanceState.putString("imageLink", savedImageUrl);
+			savedInstanceState.putString("date", savedDate);
+			savedInstanceState.putString("link", savedStoryUrl);
+			savedInstanceState.putString("title", savedTitle);
+		}
+		
 		//also, check to see if our ratingAlert is on-screen at this moment and if so, capture its data to restore
 		if (alertTitle != null)
 		{
@@ -430,6 +463,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			savedInstanceState.putInt("alertInt", alertInt);
 			alertTitle = null;
 			alertInt = -1;
+			
 		}
 		
 		super.onSaveInstanceState(savedInstanceState);
@@ -448,6 +482,18 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			//send our values to be created into an alertDialog (external method so we can reuse it within onCreate if necessary)
 			createAlert(alertTitle, alertInt);
 			
+			//check to see if we were returned an imageLink and if so, that means the user rotated the device while it was still in
+			//portrait, so we need to grab all of the required data to repopulate the detailsview that is now onscreen
+			savedImageUrl = (String) result.get("imageLink");
+			if (savedImageUrl != null)
+			{
+				savedDescription = (String) result.get("description");
+				savedDate = (String) result.get("date");
+				savedTitle = (String) result.get("title");
+				savedStoryUrl = (String) result.get("link");
+				detailFragment.populateData(alertTitle, savedDate, savedDescription, savedImageUrl, savedStoryUrl);
+				detailFragment.setRating(alertInt);
+			}
 		}
 		
 	}
@@ -490,6 +536,8 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		ratingDialog.show();
 	}
 	
+	//this is the interface method from the MainActivityFragment, which passes MainActivity an int to communicate
+	//which row was selected in its listview.  Since we already have the data here, no need to pass it back.
 	@Override
 	public void itemSelected(int position) {
 		//convert our position to the correct one chosen by the user
@@ -503,13 +551,13 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		
 		if (detailFragment != null && detailFragment.isInLayout())
 		{   	
-	    	String title = (String) dataMap.get("headline");
-	    	String date = (String) dataMap.get("date");
-	    	String description = (String) dataMap.get("description");
-	    	String imageUrl = (String) dataMap.get("imageLink");
-	    	String url = (String) dataMap.get("url");
-	    	detailFragment.showInterface(true);
-	    	detailFragment.populateData(title, date, description, imageUrl, url);
+	    	savedTitle = (String) dataMap.get("headline");
+	    	savedDate = (String) dataMap.get("date");
+	    	savedDescription = (String) dataMap.get("description");
+	    	savedImageUrl = (String) dataMap.get("imageLink");
+	    	savedStoryUrl = (String) dataMap.get("url");
+	    	detailFragment.clearImage();
+	    	detailFragment.populateData(savedTitle, savedDate, savedDescription, savedImageUrl, savedStoryUrl);
 		} else {
 			//send the data to the DetailsActivity, since our second fragment hasn't been initialized
 	    	Intent showDetail = new Intent(context, DetailView.class);

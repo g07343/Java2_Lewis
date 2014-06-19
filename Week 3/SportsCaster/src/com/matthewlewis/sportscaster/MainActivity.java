@@ -27,6 +27,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -87,7 +88,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			//if our alert was showing before the view was destroyed, recreate it
         	String oldTitle = savedInstanceState.getString("alertTitle");
         	Integer oldRating = (int) savedInstanceState.getInt("alertInt");
-        	if (oldTitle != null)
+        	if (oldTitle != null && !(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE))
         	{
         		System.out.println("Old title was:  " + oldTitle);
         		System.out.println("Old rating was:  " + oldRating);
@@ -476,8 +477,9 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 				// TODO Auto-generated method stub
 				dialog.dismiss();
 				
-				//need to set the dialog to null here manually to avoid its values being saved in the onSaveInstanceState method
+				//need to set the dialog and title to null here manually to avoid its values being saved in the onSaveInstanceState method
 				ratingDialog = null;
+				alertTitle = null;
 			}
 		});
 		

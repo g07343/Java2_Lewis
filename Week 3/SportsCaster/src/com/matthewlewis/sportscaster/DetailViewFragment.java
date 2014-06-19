@@ -43,12 +43,14 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 	private ImageView storyImage;
 	private Button webBtn;
 	private Button shareBtn;
-	private RatingBar ratingBar;
+	RatingBar ratingBar;
 	TextView titleView;
 	TextView dateView;
 	TextView descriptionView;
 	Bitmap image;
 	String imageUrl;
+	String title;
+	int rating;
 	
 	public interface detailsFragmentInterface {
 		
@@ -96,6 +98,9 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 		// check to see if we have a saved instance - if the view was destroyed, else set to the default image
 		if (savedInstanceState != null) {
 			image = (Bitmap) savedInstanceState.getParcelable("image");
+			title = (String) savedInstanceState.getString("title");
+			rating = (int) savedInstanceState.getInt("rating");
+			
 			if (image != null)
 			{  //view was destroyed previously so set saved image
 				storyImage.setImageBitmap(image);
@@ -231,21 +236,25 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 				//verify we actually got the image and if so, set to the imageView
 				if (image != null)
 				{
-					
 					storyImage.setImageBitmap(image);
 				}
-			}
-		
+			}	
 		}
 		
 		@Override
 		public void onSaveInstanceState(Bundle savedInstanceState) {
 			//save the image, even if it is null, meaning there was no internet connection originally
 			//we can check whether the image is null in the onCreate function and react accordingly
-			System.out.println("DETAILS VIEW DESTROYED!!!");
 			
+			String title = (String) titleView.getText();
+			int intRating = (int)ratingBar.getRating();
+			
+			//we need to save all of this data since we can't be sure if the view is being destroyed due to
+			//the user rotating the device or something else.  If rotating, we need the rating and title to 
+			//give to the parentActivity in order to send back for an alert dialog
 			savedInstanceState.putParcelable("image", image);
-			
+			savedInstanceState.putString("title", title);
+			savedInstanceState.putInt("rating", intRating);
 			super.onSaveInstanceState(savedInstanceState);
 		}
 		

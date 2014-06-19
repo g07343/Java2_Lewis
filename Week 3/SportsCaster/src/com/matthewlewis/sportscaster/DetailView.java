@@ -33,21 +33,25 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//check orientation
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
-		{
-			finish();
-			return;
-		}
+		
 		
 		
 		setContentView(R.layout.fragment_detail);
 		
+		
+		
+		// set up our reference to the MainActivityFragment so we can use it to
+		// call methods when needed
+		detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
+
+		// check orientation
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			finish();
+			return;
+		}
+
 		//set up a default rating number in case the user never sets a new one
 		rating = 0;
-		
-		//set up our reference to the MainActivityFragment so we can use it to call methods when needed
-		detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
 		
 		//add a nice back button using built-in functionality rather than trying to cram in more UI
 		ActionBar actionBar = getActionBar();
@@ -82,6 +86,13 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 	@Override
 	public void finish() {
 		Intent data = new Intent();
+		rating = (int) detailFragment.ratingBar.getRating();
+		if (title == null)
+		{
+			title = detailFragment.title;
+			rating = detailFragment.rating;
+		}
+		
 		data.putExtra("title", title);
 		data.putExtra("rating", rating);
 		setResult(RESULT_OK, data);

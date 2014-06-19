@@ -9,7 +9,9 @@
  * 
  * Purpose MainActivity contains the base functionality for the program.  After launch, it checks for an Internet connection, 
  * and if found, pulls data for display.  If one is not found, it attempts to load previously saved data, before finally
- * alerting the user to make sure they have an Internet connection
+ * alerting the user to make sure they have an Internet connection.  As of week 3, it uses the MainActivityFragment to contain all of its
+ * UI, and only handles the raw data of the interface.  The one exception to this is an alert dialog that displays the previous story title
+ * and rating, since this data (and the alert dialog itself) is not connected to the fragment and wouldn't make sense to put it there.
  * 
  * 
  */
@@ -506,7 +508,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	    	String description = (String) dataMap.get("description");
 	    	String imageUrl = (String) dataMap.get("imageLink");
 	    	String url = (String) dataMap.get("url");
-	    	detailFragment.clearImage();
+	    	detailFragment.showInterface(true);
 	    	detailFragment.populateData(title, date, description, imageUrl, url);
 		} else {
 			//send the data to the DetailsActivity, since our second fragment hasn't been initialized

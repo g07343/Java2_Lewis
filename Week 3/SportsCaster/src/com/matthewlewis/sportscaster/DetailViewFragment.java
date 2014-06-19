@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
 import android.widget.TextView;
@@ -51,6 +52,7 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 	String imageUrl;
 	String title;
 	int rating;
+	LinearLayout layoutContainer;
 	
 	public interface detailsFragmentInterface {
 		
@@ -79,6 +81,8 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.detailview, container);
 		
+		layoutContainer = (LinearLayout) view.findViewById(R.id.detail_container);
+		layoutContainer.setVisibility(View.GONE);
 		storyImage = (ImageView) view.findViewById(R.id.detail_image);
 		webBtn = (Button) view.findViewById(R.id.detail_webBtn);
 		shareBtn = (Button) view.findViewById(R.id.detail_shareBtn);
@@ -271,6 +275,19 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 		//in this way, the above logic within populateData() will retrieve the new story's image
 		public void clearImage() {
 			image = null;
+		}
+		
+		//this function simply sets the entire interface to be visible by toggling visibility of a conataining linearLayout.  
+		//We do this so that we aren't displaying the unformatted interface to the user before they select a story in landscape
+		public void showInterface(Boolean isShown) {
+			
+			
+			if (isShown)
+			{
+				layoutContainer.setVisibility(View.VISIBLE);
+			} else {
+				layoutContainer.setVisibility(View.GONE);
+			}
 		}
 }
 

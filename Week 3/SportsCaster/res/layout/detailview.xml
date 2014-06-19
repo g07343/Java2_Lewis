@@ -25,114 +25,121 @@
             android:background="#90000000"
             android:gravity="center"
             android:orientation="vertical" >
-
-            <TextView
-                android:id="@id/detail_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingTop="10dp"
-                android:text="@string/detail_title"
-                android:textColor="#FFF"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@id/detail_image"
-                android:layout_width="231dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:layout_weight="0.25"
-                android:contentDescription="@string/detail_contentDesc"
-                android:minHeight="130dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/generic" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="23dp"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal" >
-
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingLeft="5dp"
-                    android:text="@string/detail_dateLabel"
-                    android:textColor="#FFF" />
-
-                <TextView
-                    android:id="@id/detail_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:text="@string/detail_actualDate"
-                    android:textColor="#FFF"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="37dp"
-                android:layout_marginTop="10dp"
-                android:layout_weight="0.10"
-                android:orientation="horizontal" >
-
-                <TextView
-                    android:id="@+id/textView1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minHeight="20dp"
-                    android:paddingLeft="5dp"
-                    android:text="@string/detail_shareLabel"
-                    android:textColor="#FFF"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@id/detail_shareBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="37dp"
-                    android:layout_marginLeft="10dp"
-                    android:minHeight="50dip"
-                    android:text="@string/detail_shareBtnLabel"
-                    android:textColor="#FFF"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <RatingBar
-                android:id="@id/detail_rating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:stepSize="1" />
-			
-            <TextView
-                android:id="@id/detail_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.88"
-                android:height="100dp"
-                android:minHeight="70dp"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:scrollbars="vertical"
-                android:text="@string/detail_description"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#FFF"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@id/detail_webBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/detail_webButton"
-                android:textColor="#FFF"
-                android:textStyle="bold" />
+            
+			<LinearLayout
+			    android:layout_width="match_parent"
+			    android:layout_height="match_parent"
+			    android:orientation="vertical"
+			    android:id="@id/detail_container" >
+			    
+	            <TextView
+	                android:id="@id/detail_title"
+	                android:layout_width="match_parent"
+	                android:layout_height="wrap_content"
+	                android:gravity="center"
+	                android:paddingTop="10dp"
+	                android:text="@string/detail_title"
+	                android:textColor="#FFF"
+	                android:textStyle="bold" />
+	
+	            <ImageView
+	                android:id="@id/detail_image"
+	                android:layout_width="231dp"
+	                android:layout_height="wrap_content"
+	                android:layout_gravity="center"
+	                android:layout_marginTop="10dp"
+	                android:layout_weight="0.25"
+	                android:contentDescription="@string/detail_contentDesc"
+	                android:minHeight="130dp"
+	                android:scaleType="fitXY"
+	                android:src="@drawable/generic" />
+	
+	            <LinearLayout
+	                android:layout_width="match_parent"
+	                android:layout_height="23dp"
+	                android:layout_marginTop="10dp"
+	                android:orientation="horizontal" >
+	
+	                <TextView
+	                    android:id="@+id/textView2"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:layout_weight="1"
+	                    android:paddingLeft="5dp"
+	                    android:text="@string/detail_dateLabel"
+	                    android:textColor="#FFF" />
+	
+	                <TextView
+	                    android:id="@id/detail_date"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:layout_weight="2"
+	                    android:text="@string/detail_actualDate"
+	                    android:textColor="#FFF"
+	                    android:textStyle="bold" />
+	            </LinearLayout>
+	
+	            <LinearLayout
+	                android:layout_width="match_parent"
+	                android:layout_height="37dp"
+	                android:layout_marginTop="10dp"
+	                android:layout_weight="0.10"
+	                android:orientation="horizontal" >
+	
+	                <TextView
+	                    android:id="@+id/textView1"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:minHeight="20dp"
+	                    android:paddingLeft="5dp"
+	                    android:text="@string/detail_shareLabel"
+	                    android:textColor="#FFF"
+	                    android:textStyle="bold" />
+	
+	                <Button
+	                    android:id="@id/detail_shareBtn"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="37dp"
+	                    android:layout_marginLeft="10dp"
+	                    android:minHeight="50dip"
+	                    android:text="@string/detail_shareBtnLabel"
+	                    android:textColor="#FFF"
+	                    android:textStyle="bold" />
+	
+	            </LinearLayout>
+	
+	            <RatingBar
+	                android:id="@id/detail_rating"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_gravity="center"
+	                android:layout_marginTop="10dp"
+	                android:stepSize="1" />
+				
+	            <TextView
+	                android:id="@id/detail_description"
+	                android:layout_width="match_parent"
+	                android:layout_height="wrap_content"
+	                android:layout_weight="0.88"
+	                android:height="100dp"
+	                android:minHeight="70dp"
+	                android:paddingLeft="5dp"
+	                android:paddingRight="5dp"
+	                android:scrollbars="vertical"
+	                android:text="@string/detail_description"
+	                android:textAppearance="?android:attr/textAppearanceMedium"
+	                android:textColor="#FFF"
+	                android:textStyle="bold" />
+	
+	            <Button
+	                android:id="@id/detail_webBtn"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_gravity="center"
+	                android:text="@string/detail_webButton"
+	                android:textColor="#FFF"
+	                android:textStyle="bold" />
+	            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

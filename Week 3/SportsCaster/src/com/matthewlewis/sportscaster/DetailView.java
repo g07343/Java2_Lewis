@@ -43,7 +43,8 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 		// set up our reference to the MainActivityFragment so we can use it to
 		// call methods when needed
 		detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
-
+		detailFragment.showInterface(true);
+		
 		// check orientation
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			finish();

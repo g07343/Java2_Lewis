@@ -59,6 +59,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	private String savedDescription;
 	private String savedTitle;
 	private String savedDate;
+	private Integer savedRating;
 	private String savedStoryUrl;
 	private int alertInt;
 	private AlertDialog ratingDialog;
@@ -90,7 +91,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			
 		//check for a saved instance and get data if we have one
 		if (savedInstanceState != null )
-		{
+		{	
 			list = (ArrayList<HashMap<String, Object>>) savedInstanceState.getSerializable("saved");
 		
 			//set our adapter within our fragment via interface
@@ -99,13 +100,15 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			//if our alert was showing before the view was destroyed, recreate it
         	String oldTitle = savedInstanceState.getString("alertTitle");
         	Integer oldRating = (int) savedInstanceState.getInt("alertInt");
+        	
+        	//grab the description so we can check if there is saved data for display in landscape
         	savedDescription = savedInstanceState.getString("description");
+        	
+        	//check to see if we had an alert displaying when device was rotated
         	if (oldTitle != null && !(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE))
         	{
-        		System.out.println("Old title was:  " + oldTitle);
-        		System.out.println("Old rating was:  " + oldRating);
-        		createAlert(oldTitle, oldRating);
-        		
+        		//create our alert again from our saved data
+        		createAlert(oldTitle, oldRating);   		
         	}
         	if (savedDescription != null)
         	{
@@ -113,11 +116,18 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
         		savedDate = savedInstanceState.getString("date");
         		savedStoryUrl = savedInstanceState.getString("link");
         		savedTitle = savedInstanceState.getString("title");
+        		savedRating = (int) savedInstanceState.getInt("rating");
         		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
         		{
-        			detailFragment.populateData(savedTitle, savedDate, savedDescription, savedImageUrl, savedStoryUrl);
+        			detailFragment.clearImage();
+        			detailFragment.populateData(savedTitle, savedDate, savedDescription, savedImageUrl, savedStoryUrl, savedRating);
+        			detailFragment.rating = savedRating;
+        			detailFragment.setRating(savedRating);
         		}
         		
+        	} else {
+        		//since the second view hasn't been created yet, pass the first story so we show a formatted interface
+        		itemSelected(1);
         	}
 			
 		} else {		
@@ -252,8 +262,6 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	 * try/catch blocks around nearly every JSON operation due to ESPN's inconsistency with their responses
 	 */
 	public void displayData(ArrayList<HashMap<String, Object>> data) {
-		//hide our statusField now that we are showing data 
-		//statusField.setVisibility(View.GONE);
 		
 		//retrieve stored data using FileManager singleton
 		String rawData = FileManager.GetInstance().readFile(context, fileName);
@@ -435,7 +443,6 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			{
 				if (!alertTitleView.getText().equals(""))
 				{
-					System.out.println("TextView was NOT empty");
 					alertTitle = (String) alertTitleView.getText();
 					RatingBar oldRating = (RatingBar) ratingDialog.findViewById(R.id.ratingAlert_rating);
 					float oldFloat = oldRating.getRating();
@@ -453,6 +460,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			savedInstanceState.putString("date", savedDate);
 			savedInstanceState.putString("link", savedStoryUrl);
 			savedInstanceState.putString("title", savedTitle);
+			savedInstanceState.putInt("rating", savedRating);
 		}
 		
 		//also, check to see if our ratingAlert is on-screen at this moment and if so, capture its data to restore
@@ -478,7 +486,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			Bundle result = data.getExtras();
 			alertInt = (Integer) result.get("rating");
 			alertTitle = (String) result.get("title");
-			System.out.println("Rating returned was:  " + alertInt);
+			
 			//send our values to be created into an alertDialog (external method so we can reuse it within onCreate if necessary)
 			createAlert(alertTitle, alertInt);
 			
@@ -487,12 +495,27 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			savedImageUrl = (String) result.get("imageLink");
 			if (savedImageUrl != null)
 			{
+				//grab all of our data from the intent returned from the activity so that we can save it to 
+				//the second view if the user rotates to landscape
 				savedDescription = (String) result.get("description");
 				savedDate = (String) result.get("date");
 				savedTitle = (String) result.get("title");
 				savedStoryUrl = (String) result.get("link");
-				detailFragment.populateData(alertTitle, savedDate, savedDescription, savedImageUrl, savedStoryUrl);
-				detailFragment.setRating(alertInt);
+				savedRating = (Integer) result.getInt("rating");
+				
+				//if the user rotated the device when the second activity was still open in portrait, handle it here
+				if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && detailFragment.isInLayout())
+				{
+					//reset our image manually so that the device retrieves the correct one for the story
+					detailFragment.clearImage();
+					
+					//use our newly retrieved data to display in the detail fragment, which is now on the right side of the screen
+					detailFragment.populateData(alertTitle, savedDate, savedDescription, savedImageUrl, savedStoryUrl, savedRating);
+					
+					//set our rating
+					detailFragment.rating = savedRating;
+					detailFragment.setRating(savedRating);
+				}	
 			}
 		}
 		
@@ -530,9 +553,10 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 				alertTitle = null;
 			}
 		});
-		
+		//build the alert
 		ratingDialog = builder.create();
 		
+		//show the alert to the user
 		ratingDialog.show();
 	}
 	
@@ -547,22 +571,26 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		HashMap<String, Object> dataMap = list.get(actualSelected);
 		
 		//get an instance of the detailsViewFragment so we can check if it is valid
-		DetailViewFragment detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
+		detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
 		
+		//check to make sure we have our fragment and it is currently in the view (landscape)
 		if (detailFragment != null && detailFragment.isInLayout())
-		{   	
+		{   //grab our data for the selected story 	
 	    	savedTitle = (String) dataMap.get("headline");
 	    	savedDate = (String) dataMap.get("date");
 	    	savedDescription = (String) dataMap.get("description");
 	    	savedImageUrl = (String) dataMap.get("imageLink");
 	    	savedStoryUrl = (String) dataMap.get("url");
+	    	
+	    	//reset the image of the DetailFragment just in case, otherwise it won't display the correct one
 	    	detailFragment.clearImage();
-	    	detailFragment.populateData(savedTitle, savedDate, savedDescription, savedImageUrl, savedStoryUrl);
+	    	
+	    	//set our new data to the detailFragment
+	    	detailFragment.populateData(savedTitle, savedDate, savedDescription, savedImageUrl, savedStoryUrl, savedRating);
 		} else {
 			//send the data to the DetailsActivity, since our second fragment hasn't been initialized
 	    	Intent showDetail = new Intent(context, DetailView.class);
 	    	showDetail.putExtra("data", dataMap);
-	    	
 	    	startActivityForResult(showDetail, 0);
 		}
 		
@@ -589,6 +617,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		}
 	}
 
+	//this method is only here because it is needed within the Detail activity to communicate to its fragment
 	@Override
 	public void displayDetails(String storyTitle, String storyDate,
 			String storyDescription, String imageLink, String storyLink) {
@@ -596,10 +625,18 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		
 	}
 
+	//this method lets us apply our saved rating to the detailFragment dynamically
 	@Override
 	public void setRating(int number) {
-		// TODO Auto-generated method stub
+		savedRating = number;
 		
+	}
+
+	//this let's our detailFragment grab the saved rating from here if necessary
+	@Override
+	public Integer getRating() {
+		// TODO Auto-generated method stub
+		return savedRating;
 	}
 	
 }

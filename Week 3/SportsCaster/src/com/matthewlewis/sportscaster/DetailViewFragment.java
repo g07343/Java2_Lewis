@@ -34,7 +34,6 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
 import android.widget.TextView;
@@ -54,13 +53,13 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 	String date;
 	String description;
 	String storyUrl;
-	int rating;
-	LinearLayout layoutContainer;
+	Integer rating;
 	
 	public interface detailsFragmentInterface {
 		
 		void displayDetails(String storyTitle, String storyDate, String storyDescription, String imageLink, final String storyLink);
 		void setRating(int number);
+		Integer getRating();
 	}
 	
 	private detailsFragmentInterface parentActivity;
@@ -70,6 +69,7 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
 		
+		//make sure the activity we attach to implements our detailsFragmentInterface
 		if (activity instanceof detailsFragmentInterface)
 		{
 			parentActivity = (detailsFragmentInterface)activity;
@@ -84,8 +84,7 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.detailview, container);
 		
-		layoutContainer = (LinearLayout) view.findViewById(R.id.detail_container);
-		//layoutContainer.setVisibility(View.GONE);
+		//grab our interface elements contained within the fragment
 		storyImage = (ImageView) view.findViewById(R.id.detail_image);
 		webBtn = (Button) view.findViewById(R.id.detail_webBtn);
 		shareBtn = (Button) view.findViewById(R.id.detail_shareBtn);
@@ -93,8 +92,18 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 		titleView = (TextView) view.findViewById(R.id.detail_title);
 		dateView = (TextView) view.findViewById(R.id.detail_date);
 		descriptionView = (TextView) view.findViewById(R.id.detail_description);
+		
+		//set up a listener for when the user changes the rating
 		ratingBar.setOnRatingBarChangeListener(this);
-
+		
+		//check to see if the parentActivity has a "savedRating" value and apply is so
+		Integer savedRating = parentActivity.getRating();
+		if (savedRating != null)
+		{
+			ratingBar.setRating(savedRating);
+		}
+		
+		//set a text size according to device orientation, which helps us with the description text being too large
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
 		{
 			descriptionView.setTextSize(14);
@@ -104,14 +113,14 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 		
 		// check to see if we have a saved instance - if the view was destroyed, else set to the default image
 		if (savedInstanceState != null) {
+			//grab the data from our savedInstance so we can reapply it to our interface
 			image = (Bitmap) savedInstanceState.getParcelable("image");
 			title = (String) savedInstanceState.getString("title");
-			rating = (int) savedInstanceState.getInt("rating");
 			date = (String) savedInstanceState.getString("date");
 			description = (String) savedInstanceState.getString("description");
 			storyUrl = (String) savedInstanceState.getString("storyLink");
 			imageUrl = (String) savedInstanceState.getString("imageLink");
-			
+			rating = (int) savedInstanceState.getInt("rating");
 			if (image != null)
 			{  //view was destroyed previously so set saved image
 				storyImage.setImageBitmap(image);
@@ -130,26 +139,28 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 		return view;
 	}
 	
-	public void populateData(String storyTitle, String storyDate, String storyDescription, String imageUrlString, final String storyLink) {
+	//this method is the primary way for the parentActivity to supply the data to the fragment for display to the user
+	public void populateData(String storyTitle, String storyDate, String storyDescription, String imageUrlString, final String storyLink, Integer rating) {
 		
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+		//set passed rating to ratingBar if not null
+		if (rating != null)
 		{
-			descriptionView.setTextSize(14);
-		} else {
-			descriptionView.setTextSize(18);
+			ratingBar.setRating(rating);
 		}
-		//reset the rating whenever receiving new data
-		ratingBar.setRating(0);
-		
 		//set passed data to textViews
 		titleView.setText(storyTitle);
 		
 		dateView.setText(storyDate);
 		
 		descriptionView.setText(storyDescription);
+		
+		//set our global String to the one passed in so we can reference other places
 		description = storyDescription;
+		
+		//if necessary, allow the descriptionTextView to scroll if the content is too long
 		descriptionView.setMovementMethod(new ScrollingMovementMethod());
 		
+		//set our global imageUrlString so we can access it from other places
 		imageUrl = imageUrlString;
 		
 		//need to make sure we have internet or else we don't want to load the story's image or enable the web link button
@@ -255,25 +266,35 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 			}	
 		}
 		
+		
 		@Override
 		public void onSaveInstanceState(Bundle savedInstanceState) {
-			//save the image, even if it is null, meaning there was no internet connection originally
-			//we can check whether the image is null in the onCreate function and react accordingly
-			
+			//Save our data in case our fragments gets destroyed
+			System.out.println("DetailFragment onSaveInstanceState runs!!!");
 			String title = (String) titleView.getText();
-			int intRating = (int)ratingBar.getRating();
 			String date = (String) dateView.getText();
 			
 			//we need to save all of this data since we can't be sure if the view is being destroyed due to
-			//the user rotating the device or something else.  If rotating, we need the rating and title to 
-			//give to the parentActivity in order to send back for an alert dialog
+			//the user rotating the device or something else. 
 			savedInstanceState.putString("date", date);
 			savedInstanceState.putString("storyLink", storyUrl);
 			savedInstanceState.putString("imageLink", imageUrl);
 			savedInstanceState.putString("description", description);
 			savedInstanceState.putParcelable("image", image);
 			savedInstanceState.putString("title", title);
-			savedInstanceState.putInt("rating", intRating);
+			rating = (int) ratingBar.getRating();
+			parentActivity.setRating(rating);
+			
+			//check if the parentActivity has a rating value already, so we can ensure we don't end up with a NPI.
+			//this can happen when the device is rotated a couple times without the user actually inputting a value
+			Integer saved = parentActivity.getRating();
+			if (saved != null)
+			{
+				savedInstanceState.putInt("rating", saved);
+			} else {
+				rating = (int) ratingBar.getRating();
+				savedInstanceState.putInt("rating", rating);
+			}
 			super.onSaveInstanceState(savedInstanceState);
 		}
 		
@@ -281,9 +302,10 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 		@Override
 		public void onRatingChanged(RatingBar ratingBar, float rating,
 				boolean fromUser) {
-			//grab our current rating since the user changed it
+			//grab our current rating since the user changed it and make sure to update parentActivity's value
 			int intRating = (int)rating;
 			parentActivity.setRating(intRating);
+			System.out.println("Rating set on:  " + parentActivity.getClass().getName());
 		}
 		
 		//we use this function to manually "destroy" an old story's image when the user selects a new one in landscape
@@ -292,21 +314,10 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 			image = null;
 		}
 		
-		//this function simply sets the entire interface to be visible by toggling visibility of a conataining linearLayout.  
-		//We do this so that we aren't displaying the unformatted interface to the user before they select a story in landscape
-		public void showInterface(Boolean isShown) {
-			
-			
-			if (isShown)
-			{
-				layoutContainer.setVisibility(View.VISIBLE);
-			} else {
-				layoutContainer.setVisibility(View.GONE);
-			}
-		}
-		
+		//allows the parentActivity to manually apply a rating to our ratingBar
 		public void setRating(int passedRating) {
-			ratingBar.setRating((float) passedRating);
+			
+			ratingBar.setRating(passedRating);
 		}
 }
 

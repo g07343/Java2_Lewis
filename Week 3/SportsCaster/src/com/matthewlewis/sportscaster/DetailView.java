@@ -31,7 +31,7 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 	DetailViewFragment detailFragment;
 	String description;
 	String date;
-	int rating;
+	Integer rating;
 	Bitmap image;
 	
 	@Override
@@ -43,9 +43,9 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 		// set up our reference to the MainActivityFragment so we can use it to
 		// call methods when needed
 		detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
-		detailFragment.showInterface(true);
 		
-		// check orientation
+		
+		// check orientation and if in landscape, end the activity
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			finish();
 			return;
@@ -72,6 +72,7 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 		imageUrl = (String) storyData.get("imageLink");
 		storyUrl = (String) storyData.get("url");
 		
+		//call a method to send our data to our child fragment
 		displayDetails(title, date, description, imageUrl, storyUrl);
 	}
 	
@@ -86,28 +87,43 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 	// the rating and title back to MainActivity
 	@Override
 	public void finish() {
+		//create an intent to send back to MainActivity
 		Intent data = new Intent();
-		rating = (int) detailFragment.ratingBar.getRating();
+		
 		//if title is equal to null at this point, then we know the phone has been rotated to landscape
 		//from the protrait view/single activity, so grab the data we need to repopulate the DetailViewFragment
 		if (title == null)
 		{
 			title = detailFragment.title;
-			rating = detailFragment.rating;
-			image = detailFragment.image;
 			date = detailFragment.date;
-			description = detailFragment.description;
-			storyUrl = detailFragment.storyUrl;
-			imageUrl = detailFragment.imageUrl;
-			data.putExtra("date", date);
-			data.putExtra("link", storyUrl);
-			data.putExtra("description", description);
-			data.putExtra("imageLink", imageUrl );
+		} else {
+			
+			date = (String) detailFragment.dateView.getText();
 		}
+		//make sure the rating isn't null, which it can be when in landscape
+		if (rating == null)
+		{
+			rating = detailFragment.rating;
+		} else {
+			rating = (int) detailFragment.ratingBar.getRating();
+		}
+		
+		//grab the rest of the data from the fragment UI to return to the MainActivity
+		image = detailFragment.image;
+		description = detailFragment.description;
+		storyUrl = detailFragment.storyUrl;
+		imageUrl = detailFragment.imageUrl;
+		
+		//add the data to our intent
+		data.putExtra("date", date);
+		data.putExtra("link", storyUrl);
+		data.putExtra("description", description);
+		data.putExtra("imageLink", imageUrl );
 		
 		//we only really need to pass the title and rating if the device is in portrait
 		data.putExtra("title", title);
 		data.putExtra("rating", rating);
+		
 		setResult(RESULT_OK, data);
 		super.finish();
 	}
@@ -123,11 +139,18 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 	public void displayDetails(String storyTitle, String storyDate,
 			String storyDescription, String imageLink, final String storyLink) {
 		detailFragment.populateData(storyTitle, storyDate, storyDescription,
-				imageLink, storyLink);
+				imageLink, storyLink, null);
 	}
 
+	//lets us set the rating for our child fragment's "rating" integer
 	public void setRating(int number) {
 		rating = number;
-		System.out.println("Rating is:  " + rating);
+	}
+
+	//this method allows the DetailsFragment to grab the DetailView class's current value for "rating".
+	@Override
+	public Integer getRating() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

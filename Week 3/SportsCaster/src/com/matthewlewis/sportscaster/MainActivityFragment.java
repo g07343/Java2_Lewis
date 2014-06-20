@@ -65,18 +65,24 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 		// TODO Auto-generated method stub
 		
 		View view = inflater.inflate(R.layout.activity_main, container);
+		
+		//grab and assign our interface elements contained within the fragment
 		reloadBtn = (Button) view.findViewById(R.id.reload_btn);
 		statusField = (TextView) view.findViewById(R.id.internet_warning);
 		listview = (ListView) view.findViewById(R.id.list);
 		
+		//apply our listview header here
 		View listHeader = inflater.inflate(R.layout.header,
 				null);
 		listview.addHeaderView(listHeader);
 		
+		//hide our reloadBtn and statusField by default, and let the MainActivity communicate when to show them
+		//and what they'll display
 		reloadBtn.setVisibility(View.GONE);
 		reloadBtn.setOnClickListener(this);
 		statusField.setVisibility(View.GONE);
 		
+		//set up an onItemClick listener for our listview to let MainActivity know what is selected via the interface
 		listview.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View view,
 	                int position, long id) {
@@ -85,11 +91,11 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	        	parentActivity.itemSelected(position);
 	        }
 	    });
-		
-		
+		//now that the view is created, return it for display
 		return view;
 	}
 
+	//set up an onClick listener for our internet "reload" button to check for network connectivity in the event there is none
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
@@ -123,7 +129,7 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	public void toggleStatusUI(String message) {
 		
 		if(message != null)
-		{
+		{	//since we received a message, set it to the statusField and make sure it's visible
 			statusField.setVisibility(View.VISIBLE);
 			statusField.setText(message);
 		} else {

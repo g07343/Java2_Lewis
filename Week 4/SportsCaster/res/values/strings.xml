@@ -22,4 +22,8 @@
 	<string name="ratingAlert_mainLabel">Rating was: </string>
 	<string name="detail_shareLabel">Like this story?</string>
 	<string name="detail_shareBtnLabel">Share it!</string>
+	<string name="menu_search">Search</string>
+	<string name="menu_preferences">Preferences</string>
+	<string name="menu_favorites">Favorites</string>
+	<string name="menu_info">Info</string>
 </resources>

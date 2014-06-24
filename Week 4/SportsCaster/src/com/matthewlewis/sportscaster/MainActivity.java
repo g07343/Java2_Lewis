@@ -192,7 +192,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	public boolean onCreateOptionsMenu(Menu menu) {
 
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.action_bar_menu, menu);
 		return true;
 	}
 
@@ -460,7 +460,12 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			savedInstanceState.putString("date", savedDate);
 			savedInstanceState.putString("link", savedStoryUrl);
 			savedInstanceState.putString("title", savedTitle);
-			savedInstanceState.putInt("rating", savedRating);
+			if (savedRating != null)
+			{
+				savedInstanceState.putInt("rating", savedRating);
+			} else {
+				savedInstanceState.putInt("rating", 0);
+			}		
 		}
 		
 		//also, check to see if our ratingAlert is on-screen at this moment and if so, capture its data to restore

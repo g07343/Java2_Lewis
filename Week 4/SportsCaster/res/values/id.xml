@@ -60,4 +60,16 @@
     <item
         type="id"
         name="detail_container"/>
+    <item
+        type="id"
+        name="menu_search"/>
+    <item
+        type="id"
+        name="menu_info"/>
+    <item
+        type="id"
+        name="menu_preferences"/>
+    <item
+        type="id"
+        name="menu_favorites"/>
 </resources>

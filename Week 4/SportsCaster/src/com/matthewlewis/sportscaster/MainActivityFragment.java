@@ -14,6 +14,7 @@ package com.matthewlewis.sportscaster;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -36,11 +37,14 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	static TextView statusField;
 	private static ListView listview;
 	Button reloadBtn;
+	private SimpleAdapter adapter;
+	ArrayList<HashMap<String, Object>> storyItems;
+	
 	
 	public interface mainFragmentInterface {
 		
 		void applyAdapter(Context context, ArrayList<HashMap<String, Object>> list);
-		void itemSelected(int position);
+		void itemSelected(int position, String title);
 		void updateStatus(String status);
 	}
 	
@@ -88,9 +92,18 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	                int position, long id) {
 	        	//call the interfaced method startDetailsActivity, and pass the selected number.  
 	        	//Since the parentActivity has the data already, no need to pass the data itself back.
-	        	parentActivity.itemSelected(position);
+	        	if (adapter.getCount() < 10)
+	        	{
+	        		TextView selectedStory = (TextView) view.findViewById(R.id.title);
+	        		String selectedTitle = selectedStory.getText().toString();
+	        		//System.out.println("User filtered stories.  Selected was:  " + selectedTitle);
+	        		parentActivity.itemSelected(position, selectedTitle);
+	        	}
+	        	parentActivity.itemSelected(position, null);
 	        }
 	    });
+		
+		
 		//now that the view is created, return it for display
 		return view;
 	}
@@ -113,7 +126,9 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	//this method sets the listView's adapter using an array of hashmap objects passed from the MainActivity class 
 	public void setData(final Context context, final ArrayList<HashMap<String, Object>> list) {
 		//create a SimpleAdapter to use with the above passed array of data
-				SimpleAdapter adapter = new SimpleAdapter(context, list,
+		storyItems = list;
+		
+		adapter = new SimpleAdapter(context, list,
 						R.layout.row, new String[] { (String) "headline",
 								(String) "date", "description", "icon" },
 						new int[] { R.id.title, R.id.date, R.id.description,
@@ -140,5 +155,25 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 			//display our button, which rechecks Internet
 			reloadBtn.setVisibility(View.VISIBLE);
 		}
+	}
+	
+	public void filterData(CharSequence s) {
+		ArrayList<HashMap<String, Object>> newList = new ArrayList<HashMap<String, Object>>();
+		for(int i = 0; i < adapter.getCount(); i++)
+		{
+			@SuppressWarnings("unchecked")
+			HashMap<String, Object> currentStory = (HashMap<String, Object>) adapter.getItem(i);
+			String searchParam = s.toString();
+			//System.out.println("Passed converted char sequence is:  " + searchParam);
+			String currentTitle = (String) currentStory.get("headline");
+			String currentTitleLowerCase = currentTitle.toLowerCase(Locale.US);
+			if (currentTitle.contains(searchParam) || currentTitleLowerCase.contains(searchParam) || currentTitle.contains(searchParam.toLowerCase(Locale.US)) || currentTitleLowerCase.contains(searchParam.toLowerCase()))
+			{
+				HashMap<String, Object> dataMap = storyItems.get(i);
+				newList.add(dataMap);
+			}
+		}
+		
+		setData(MainActivity.context, newList);
 	}
 }

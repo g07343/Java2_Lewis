@@ -46,7 +46,7 @@ import android.widget.Toast;
 import com.matthewlewis.sportscaster.NetworkManager;
 
 public class MainActivity extends Activity implements MainActivityFragment.mainFragmentInterface,
-	DetailViewFragment.detailsFragmentInterface{
+	DetailViewFragment.detailsFragmentInterface, SearchFragment.searchFragmentInterface {
 
 	//declare class variables
 	private static String apiURL = "http://api.espn.com/v1/now/popular?limit=10&apikey=q82zaw4uydmpw6ccfcgh8ze2";
@@ -127,7 +127,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
         		
         	} else {
         		//since the second view hasn't been created yet, pass the first story so we show a formatted interface
-        		itemSelected(1);
+        		itemSelected(1, null);
         	}
 			
 		} else {		
@@ -203,10 +203,16 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
+		switch(id) {
+			case R.id.menu_search:
+				SearchFragment searchFrag = SearchFragment.newInstance();
+				searchFrag.show(getFragmentManager(), "search_dialog");
+				break;
+			
+			default:
+				break;
 		}
-		return super.onOptionsItemSelected(item);
+		return true;
 	}
 
 	/**
@@ -568,7 +574,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	//this is the interface method from the MainActivityFragment, which passes MainActivity an int to communicate
 	//which row was selected in its listview.  Since we already have the data here, no need to pass it back.
 	@Override
-	public void itemSelected(int position) {
+	public void itemSelected(int position, String title) {
 		//convert our position to the correct one chosen by the user
 		int actualSelected = position -=1;
 		
@@ -577,6 +583,11 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		
 		//get an instance of the detailsViewFragment so we can check if it is valid
 		detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
+		
+		if (title != null)
+		{
+			System.out.println("Selected story was:  " + title);
+		}
 		
 		//check to make sure we have our fragment and it is currently in the view (landscape)
 		if (detailFragment != null && detailFragment.isInLayout())
@@ -642,6 +653,11 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	public Integer getRating() {
 		// TODO Auto-generated method stub
 		return savedRating;
+	}
+
+	@Override
+	public void applyFilter(CharSequence s) {
+		mainFragment.filterData(s);
 	}
 	
 }

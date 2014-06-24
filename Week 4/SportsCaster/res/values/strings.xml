@@ -26,4 +26,8 @@
 	<string name="menu_preferences">Preferences</string>
 	<string name="menu_favorites">Favorites</string>
 	<string name="menu_info">Info</string>
+	<string name="search_title">Search stories by title</string>
+	<string name="search_inputHint">story title to search</string>
+	<string name="search_buttonLabel">Find it!</string>
+	<string name="search_cancel">Cancel</string>
 </resources>

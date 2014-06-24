@@ -72,4 +72,16 @@
     <item
         type="id"
         name="menu_favorites"/>
+    <item
+        type="id" 
+        name="search_textEntry"/>
+    <item
+        type="id"
+         name="search_submitBtn"/>
+    <item
+        type="id"
+         name="search_cancel"/>
+    <item
+        type="id"
+         name="search_container"/>
 </resources>

@@ -97,6 +97,13 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			//set our adapter within our fragment via interface
 			applyAdapter(context, list);
 			
+			//check to see if the user had left a search "open" before rotation, and if so, restore it
+			String previousSearch = savedInstanceState.getString("searched");
+			if (previousSearch != null)
+			{
+				applyFilter(previousSearch);
+			}
+			
 			//if our alert was showing before the view was destroyed, recreate it
         	String oldTitle = savedInstanceState.getString("alertTitle");
         	Integer oldRating = (int) savedInstanceState.getInt("alertInt");
@@ -483,6 +490,11 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			alertTitle = null;
 			alertInt = -1;
 			
+		}
+		
+		if (mainFragment.searchedString != null)
+		{
+			savedInstanceState.putString("searched", mainFragment.searchedString);
 		}
 		
 		super.onSaveInstanceState(savedInstanceState);

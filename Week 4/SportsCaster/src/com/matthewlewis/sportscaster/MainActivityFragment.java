@@ -40,7 +40,9 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	Button reloadBtn;
 	private SimpleAdapter adapter;
 	ArrayList<HashMap<String, Object>> storyItems;
+	ArrayList<HashMap<String, Object>> newList;
 	View listFooter;
+	String searchedString;
 	
 	public interface mainFragmentInterface {
 		
@@ -68,6 +70,20 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
+		
+		if (savedInstanceState != null)
+		{
+			ArrayList<HashMap<String, Object>> savedList = (ArrayList<HashMap<String, Object>>) savedInstanceState.getSerializable("data");
+			if(savedList != null)
+			{
+				setData(getActivity(), savedList);
+			}
+			String searchedTerm = savedInstanceState.getString("searched");
+			if (searchedTerm != null)
+			{
+				setFooter(searchedTerm);
+			}
+		}
 		
 		View view = inflater.inflate(R.layout.activity_main, container);
 		
@@ -162,8 +178,9 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	}
 	
 	public void filterData(CharSequence s) {
-		ArrayList<HashMap<String, Object>> newList = new ArrayList<HashMap<String, Object>>();
+		newList = new ArrayList<HashMap<String, Object>>();
 		String searchParam = s.toString();
+		searchedString = searchParam;
 		for(int i = 0; i < adapter.getCount(); i++)
 		{
 			@SuppressWarnings("unchecked")
@@ -239,5 +256,24 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 				}
 				
 				listview.addFooterView(listFooter);
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		if (newList != null)
+		{
+			savedInstanceState.putSerializable("data", newList);
+		} else {
+			savedInstanceState.putSerializable("data", storyItems);
+		}
+		
+		//if there was a term that was searched for, grab it and save it so we can repopulate the list accordingly 
+		TextView searchedLabel = (TextView) listFooter.findViewById(R.id.footer_searchLabel);
+		String searched = searchedLabel.getText().toString();
+		if (!(searched.equals("searched string")))
+		{
+			System.out.println("Saving the searched term:  " + searched);
+			savedInstanceState.putString("searched", searched);
+		}
 	}
 }

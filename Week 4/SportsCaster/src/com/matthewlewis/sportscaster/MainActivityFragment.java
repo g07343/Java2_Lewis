@@ -19,8 +19,10 @@ import java.util.Locale;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -43,6 +45,8 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	ArrayList<HashMap<String, Object>> newList;
 	View listFooter;
 	String searchedString;
+	TextView userLabel;
+	SharedPreferences prefs;
 	
 	public interface mainFragmentInterface {
 		
@@ -71,8 +75,13 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		
+		prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		String savedName = prefs.getString("userName", "");
+		
+		
 		if (savedInstanceState != null)
 		{
+			@SuppressWarnings("unchecked")
 			ArrayList<HashMap<String, Object>> savedList = (ArrayList<HashMap<String, Object>>) savedInstanceState.getSerializable("data");
 			if(savedList != null)
 			{
@@ -86,6 +95,12 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 		}
 		
 		View view = inflater.inflate(R.layout.activity_main, container);
+		
+		userLabel = (TextView) view.findViewById(R.id.user_label);
+		if (!(savedName.isEmpty()))
+		{
+			userLabel.setText("Welcome, " + savedName + "!");
+		}
 		
 		//grab and assign our interface elements contained within the fragment
 		reloadBtn = (Button) view.findViewById(R.id.reload_btn);
@@ -275,5 +290,14 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 			System.out.println("Saving the searched term:  " + searched);
 			savedInstanceState.putString("searched", searched);
 		}
+	}
+	
+	//we use this method to allow our MainActivity to manually refresh our "nameLabel" which sits above the listView to reflect
+	//the user's newly entered name.  We only need to do this once, when the app is loaded the first time
+	public void updateName() {
+		System.out.println("UpdateName runs from within fragment!");
+		
+		String savedName = prefs.getString("userName", "");
+		userLabel.setText("Welcome, " + savedName + "!");
 	}
 }

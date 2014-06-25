@@ -3,6 +3,7 @@
 
     <string name="app_name">SportsCaster</string>
     <string name="detailView_name">Story Details</string>
+    <string name="user_name">Welcome, User!</string>
     <string name="mainActivity_storiesLabel">Top Sports Stories:</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -34,4 +35,10 @@
 	<string name="footer_regularLabel">result(s) found for:</string>
 	<string name="footer_searchLabel">searched string</string>
 	<string name="footer_resetBtn">Clear filter</string>
+	<string name="preferences_title">Welcome!</string>
+	<string name="perferences_subHeading">It looks like this is the first time you\'ve used SportsCaster.  Tell us a bit about yourself!</string>
+	<string name="preferences_nameField">your name</string>
+	<string name="preferences_sportsField">your favorite sport</string>
+	<string name="preferences_saveBtn">Save it!</string>
+	<string name="preferences_detailDisclosure">You can always change these again later from within "Preferences"</string>
 </resources>

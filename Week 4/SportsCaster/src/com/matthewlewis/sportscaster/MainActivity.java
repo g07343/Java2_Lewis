@@ -29,11 +29,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -63,8 +65,10 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	private String savedStoryUrl;
 	private int alertInt;
 	private AlertDialog ratingDialog;
-	MainActivityFragment mainFragment;
+	static MainActivityFragment mainFragment;
 	DetailViewFragment detailFragment;
+	SharedPreferences prefs;
+	SharedPreferences.Editor editor;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -74,6 +78,14 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		setContentView(R.layout.fragment_main);
 		//set our public variable context, so outside classes can access it if needed
 		context = this;
+		
+		//check out the status of our sharedPreferences, and depending on the result, do something
+		prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		if(prefs.getString("userName", "").toString().isEmpty())
+		{  //we haven't established our users identity yet, so launch our dialogFragment to prompt user
+			PreferencesFragment prefFrag = PreferencesFragment.newInstance();
+			prefFrag.show(getFragmentManager(), "preferences_dialog");
+		}
 		
 		//set up our reference to the MainActivityFragment so we can use it to call methods when needed
 		mainFragment = (MainActivityFragment) getFragmentManager().findFragmentById(R.id.main_fragment);
@@ -216,6 +228,10 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 				searchFrag.show(getFragmentManager(), "search_dialog");
 				break;
 			
+			case R.id.menu_preferences:
+				PreferencesFragment prefFrag = PreferencesFragment.newInstance();
+				prefFrag.show(getFragmentManager(), "preferences_dialog");
+				
 			default:
 				break;
 		}
@@ -683,6 +699,11 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	@Override
 	public void applyFilter(CharSequence s) {
 		mainFragment.filterData(s);
+	}
+
+	public static void updateFragment() {
+		// TODO Auto-generated method stub
+		mainFragment.updateName();
 	}
 	
 }

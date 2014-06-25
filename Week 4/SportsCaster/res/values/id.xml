@@ -5,6 +5,9 @@
         name="internet_warning"/>
     <item
         type="id"
+         name="user_label"/>
+    <item
+        type="id"
          name="list"/>
     <item
         type="id"
@@ -96,4 +99,22 @@
     <item
         type="id"
          name="footer_resetBtn"/>
+    <item
+        type="id"
+        name="preferences_title"/>
+    <item
+        type="id"
+        name="preferences_subHeading"/>
+    <item
+        type="id"
+        name="preferences_nameField"/>
+    <item
+        type="id"
+        name="preferences_sportField"/>
+    <item
+        type="id"
+        name="preferences_saveBtn"/>
+    <item
+        type="id"
+        name="preferences_detailDisclosure"/>
 </resources>

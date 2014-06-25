@@ -30,4 +30,8 @@
 	<string name="search_inputHint">story title to search</string>
 	<string name="search_buttonLabel">Find it!</string>
 	<string name="search_cancel">Cancel</string>
+	<string name="footer_intLabel">Int</string>
+	<string name="footer_regularLabel">result(s) found for:</string>
+	<string name="footer_searchLabel">searched string</string>
+	<string name="footer_resetBtn">Clear filter</string>
 </resources>

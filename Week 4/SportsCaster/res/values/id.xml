@@ -84,4 +84,16 @@
     <item
         type="id"
          name="search_container"/>
+    <item
+        type="id"
+         name="footer_intLabel"/>
+    <item
+        type="id"
+         name="footer_regularLabel"/>
+    <item
+        type="id"
+         name="footer_searchLabel"/>
+    <item
+        type="id"
+         name="footer_resetBtn"/>
 </resources>

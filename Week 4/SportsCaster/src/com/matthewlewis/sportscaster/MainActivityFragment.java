@@ -19,6 +19,7 @@ import java.util.Locale;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +40,7 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	Button reloadBtn;
 	private SimpleAdapter adapter;
 	ArrayList<HashMap<String, Object>> storyItems;
-	
+	View listFooter;
 	
 	public interface mainFragmentInterface {
 		
@@ -137,6 +138,7 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 				//set our adapter
 				listview.setAdapter(adapter);
 				statusField.setVisibility(View.GONE);
+				setFooter(null);
 	}
 	
 	//this method gets called by the parentActivity when no internet is detected and no local storage exists
@@ -159,11 +161,11 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	
 	public void filterData(CharSequence s) {
 		ArrayList<HashMap<String, Object>> newList = new ArrayList<HashMap<String, Object>>();
+		String searchParam = s.toString();
 		for(int i = 0; i < adapter.getCount(); i++)
 		{
 			@SuppressWarnings("unchecked")
 			HashMap<String, Object> currentStory = (HashMap<String, Object>) adapter.getItem(i);
-			String searchParam = s.toString();
 			//System.out.println("Passed converted char sequence is:  " + searchParam);
 			String currentTitle = (String) currentStory.get("headline");
 			String currentTitleLowerCase = currentTitle.toLowerCase(Locale.US);
@@ -175,5 +177,65 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 		}
 		
 		setData(MainActivity.context, newList);
+		setFooter(searchParam);
+	}
+	
+	//this method controls our dynamic footer, which displays data relevant to the stories within the listview.  When the user enters a search
+	//the footer displays the number of results, the searched string, and a button to reset the listview.
+	public void setFooter(String searchedString) {
+		//need to remove any instances of previous listView footer
+		if (listFooter != null)
+		{
+			listview.removeFooterView(listFooter);
+		}
+		
+		LayoutInflater inflater = getActivity().getLayoutInflater();
+		//apply our listview header here
+				listFooter = inflater.inflate(R.layout.footer,
+						null);
+				
+				TextView numResults = (TextView) listFooter.findViewById(R.id.footer_intLabel);
+				TextView defaultLabel = (TextView) listFooter.findViewById(R.id.footer_regularLabel);
+				final TextView searchedLabel = (TextView) listFooter.findViewById(R.id.footer_searchLabel);
+				final Button resetBtn = (Button) listFooter.findViewById(R.id.footer_resetBtn);
+				
+				int listLength = adapter.getCount();
+				String lengthString = String.valueOf(listLength);
+				numResults.setText(lengthString);
+				
+				//populate our data according to whether a string is passed, which determines if the user searched something
+				if (searchedString != null)
+				{
+					defaultLabel.setText(R.string.footer_regularLabel);
+					searchedLabel.setText("\""+searchedString+"\"");
+					searchedLabel.setVisibility(View.VISIBLE);
+					resetBtn.setVisibility(View.VISIBLE);
+					if(listLength < 1)
+					{
+						numResults.setTextColor(Color.RED);
+					}		
+					
+					//set up our button to reset our listView to it's default stories
+					resetBtn.setOnClickListener(new OnClickListener(){
+
+						@Override
+						public void onClick(View v) {
+							// TODO Auto-generated method stub
+							searchedLabel.setVisibility(View.GONE);
+							resetBtn.setVisibility(View.GONE);
+							//setData(MainActivity.context, storyItems);
+							parentActivity.applyAdapter(getActivity(), MainActivity.list);
+						}
+						
+					});
+					
+				} else {
+					//user did not search anything, so set up the footer to display its default state
+					defaultLabel.setText("stories retrieved!");
+					searchedLabel.setVisibility(View.GONE);
+					resetBtn.setVisibility(View.GONE);
+				}
+				
+				listview.addFooterView(listFooter);
 	}
 }

@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:paddingTop="15dp"
     android:id="@id/search_container" >
 
     <TextView
@@ -19,6 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:layout_marginTop="10dp"
             android:hint="@string/search_inputHint"
             android:inputType="text|textMultiLine" >
 			

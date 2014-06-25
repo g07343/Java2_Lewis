@@ -579,7 +579,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		int actualSelected = position -=1;
 		
 		//grab the hashmap with our selected story's data
-		HashMap<String, Object> dataMap = list.get(actualSelected);
+		HashMap<String, Object> dataMap = null;
 		
 		//get an instance of the detailsViewFragment so we can check if it is valid
 		detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
@@ -587,6 +587,19 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		if (title != null)
 		{
 			System.out.println("Selected story was:  " + title);
+			
+			for (int i = 0; i < list.size(); i++)
+			{
+				HashMap<String, Object> storyData = list.get(i);
+				String savedTitle = (String) storyData.get("headline");
+				if (savedTitle.equals(title))
+				{
+					dataMap = storyData;
+					break;
+				}
+			}
+		} else {
+			dataMap = list.get(actualSelected);
 		}
 		
 		//check to make sure we have our fragment and it is currently in the view (landscape)

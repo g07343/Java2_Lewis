@@ -99,8 +99,10 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	        		String selectedTitle = selectedStory.getText().toString();
 	        		//System.out.println("User filtered stories.  Selected was:  " + selectedTitle);
 	        		parentActivity.itemSelected(position, selectedTitle);
+	        	} else {
+	        		parentActivity.itemSelected(position, null);
 	        	}
-	        	parentActivity.itemSelected(position, null);
+	        	System.out.println("NUMBER OF ITEMS IN LISTVIEW IS:  " + adapter.getCount());      	
 	        }
 	    });
 		
@@ -223,7 +225,7 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 							// TODO Auto-generated method stub
 							searchedLabel.setVisibility(View.GONE);
 							resetBtn.setVisibility(View.GONE);
-							//setData(MainActivity.context, storyItems);
+							//reset our listview using parentActivity's unmodified data
 							parentActivity.applyAdapter(getActivity(), MainActivity.list);
 						}
 						

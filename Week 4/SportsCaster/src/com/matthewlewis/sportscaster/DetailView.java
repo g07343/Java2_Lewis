@@ -78,8 +78,8 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 		
 		//grab our individual bits of data to apply to the UI
 		title = (String) storyData.get("headline");
-		String date = (String) storyData.get("date");
-		String description = (String) storyData.get("description");
+		date = (String) storyData.get("date");
+		description = (String) storyData.get("description");
 		imageUrl = (String) storyData.get("imageLink");
 		storyUrl = (String) storyData.get("url");
 		
@@ -182,14 +182,14 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 						alreadySaved = true;
 						//story successfully saved, alert user
 						Toast.makeText(getApplicationContext(),
-								"Story successfully saved!  To remove it, tap the icon again.",
+								"Story favorited!  To undo, tap the icon again.",
 								Toast.LENGTH_LONG).show();
 					}
 				} else {
 					alreadySaved = true;
 					//story successfully saved, alert user
 					Toast.makeText(getApplicationContext(),
-							"Story successfully saved!  To remove it, tap the icon again.",
+							"Story favorited!  To undo, tap the icon again.",
 							Toast.LENGTH_LONG).show();
 				}
 				

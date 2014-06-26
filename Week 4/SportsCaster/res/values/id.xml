@@ -129,4 +129,16 @@
     <item
         type="id"
          name="menu_detail_favorite"/>
+    <item
+        type="id"
+         name="favRow_title"/>
+    <item
+        type="id"
+         name="favRow_date"/>
+    <item
+        type="id"
+         name="favRow_description"/>
+    <item
+        type="id"
+         name="favRow_bgToggle"/>
 </resources>

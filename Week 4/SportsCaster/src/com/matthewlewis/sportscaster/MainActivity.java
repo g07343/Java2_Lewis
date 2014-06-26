@@ -241,6 +241,8 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 				} else {
 					//we're in portrait, so launch the favorites activity
 					System.out.println("Favorites tapped in portrait!");
+					Intent showDetail = new Intent(context, FavoritesActivity.class);
+			    	startActivityForResult(showDetail, 0);
 				}
 				break;
 			default:

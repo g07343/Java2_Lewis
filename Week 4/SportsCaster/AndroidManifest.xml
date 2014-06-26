@@ -31,6 +31,13 @@
                 
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.matthewlewis.sportscaster.FavoritesActivity"
+            android:label ="@string/favorites_activityLabel" >
+            <intent-filter>
+                
+            </intent-filter>
+        </activity>
         <service android:name="APIService"></service>
     </application>
 

@@ -45,4 +45,6 @@
 	<string name="favorites_warning">Depending on how long ago the stories were saved, links and images may no longer work.</string>
 	<string name="favorites_noStories">Uh-oh.  Looks like you haven\'t saved any favorites yet.  Go back and find some!</string>
 	<string name="favorites_activityLabel">Favorites</string>
+	<string name="contextual_addItem">Add story to Favorites!</string>
+	<string name="contextual_goTo">Go to Favorites</string>
 </resources>

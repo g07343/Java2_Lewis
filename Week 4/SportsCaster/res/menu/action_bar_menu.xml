@@ -10,7 +10,16 @@
 	    android:id="@id/menu_favorites"
 	    android:icon="@drawable/ic_action_important"
 	    android:showAsAction="ifRoom"
-	    android:title="@string/menu_favorites"/>
+	    android:title="@string/menu_favorites">
+		<menu android:id="@id/contextual_menuHolder">
+		    <item
+		        android:id="@id/contextual_addFav"
+		        android:title="@string/contextual_addItem" />
+		    <item
+		        android:id="@id/contextual_goToFav"
+		        android:title="@string/contextual_goTo" />	    
+	    </menu>
+	</item>
 	<item
 	    android:id="@id/menu_info"
 	    android:icon="@drawable/ic_action_about"

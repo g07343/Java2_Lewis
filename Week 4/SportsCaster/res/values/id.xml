@@ -141,4 +141,12 @@
     <item
         type="id"
          name="favRow_bgToggle"/>
+    <item
+        type="id" 
+        name="contextual_addFav"/>
+    <item
+        type="id" 
+        name="contextual_goToFav"/>
+    <item
+        type="id" name="contextual_menuHolder"/>
 </resources>

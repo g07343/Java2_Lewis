@@ -40,6 +40,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -215,7 +216,18 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		getMenuInflater().inflate(R.menu.action_bar_menu, menu);
 		return true;
 	}
-
+	
+	//we use this function to dynamically hide the "favorites" contextual menu in portrait, since it only needs to serve one function there
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		System.out.println("Prepare menu runs!");
+		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+		{
+			SubMenu sub = menu.getItem(1).getSubMenu();
+			sub.clear();
+		}
+		return super.onPrepareOptionsMenu(menu);
+	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -234,16 +246,60 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 				prefFrag.show(getFragmentManager(), "preferences_dialog");
 				break;
 			case R.id.menu_favorites:
-				if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-					//detect if we're in landscape, and if so, we need to give user a choice to either add the 
-					//currently selected story to favorites, or display the actual favorites activity
-					System.out.println("Favorites tapped in landscape!");
-				} else {
-					//we're in portrait, so launch the favorites activity
-					System.out.println("Favorites tapped in portrait!");
-					Intent showDetail = new Intent(context, FavoritesActivity.class);
-			    	startActivityForResult(showDetail, 0);
+				if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+					//detect if we're in portrait, and if so, load Favorites Activity.  We only do this in portrait,
+					//because in landscape there is a contextual menu that dynamically displays the below 2 options
+					Intent showFavorites = new Intent(context, FavoritesActivity.class);
+			    	startActivityForResult(showFavorites, 0);
 				}
+				break;
+			case R.id.contextual_addFav:
+				//user tapped the 'add favorite' option from contextual menu in landscape
+				System.out.println("ADD FAV");
+				String title = detailFragment.titleView.getText().toString();
+				String date = detailFragment.dateView.getText().toString();
+				String imageUrl = detailFragment.imageUrl;
+				String storyUrl = detailFragment.storyUrl;
+				String description = detailFragment.descriptionView.getText().toString();
+				int rating = (int) detailFragment.ratingBar.getRating();
+				JSONObject storyObject = new JSONObject();
+				try {
+					storyObject.put("title", title);
+					storyObject.put("date", date);
+					storyObject.put("imageUrl", imageUrl);
+					storyObject.put("storyUrl", storyUrl);
+					storyObject.put("description", description);
+					storyObject.put("rating", rating);
+					
+					//send the JSON formatted story for saving and check the returned String for success
+					FileManager fileManager = FileManager.GetInstance();
+					String wasSaved = fileManager.writeFavorites(context, favFileName, storyObject);
+					if (wasSaved != null) {
+						if (wasSaved.equals("Story is already a favorite")) {
+							Toast.makeText(getApplicationContext(),
+									"This story was already a favorite!",
+									Toast.LENGTH_LONG).show();
+						} else {
+							Toast.makeText(getApplicationContext(),
+									"Story favorited!",
+									Toast.LENGTH_LONG).show();
+						}
+					} else {
+						Toast.makeText(getApplicationContext(),
+								"Story favorited!",
+								Toast.LENGTH_LONG).show();
+					}
+					
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				break;
+			case R.id.contextual_goToFav:
+				//user tapped the 'go to favorites' option from contextual menu in landscape
+				System.out.println("GOTO FAV");
+				Intent showFavorites = new Intent(context, FavoritesActivity.class);
+		    	startActivityForResult(showFavorites, 0);
 				break;
 			default:
 				break;

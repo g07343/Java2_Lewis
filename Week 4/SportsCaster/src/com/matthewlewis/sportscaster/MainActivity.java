@@ -231,7 +231,17 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			case R.id.menu_preferences:
 				PreferencesFragment prefFrag = PreferencesFragment.newInstance();
 				prefFrag.show(getFragmentManager(), "preferences_dialog");
+				break;
+			case R.id.menu_favorites:
+				if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+					//detect if we're in landscape, and if so, we need to give user a choice to either add the 
+					//currently selected story to favorites, or display the actual favorites activity
 				
+				} else {
+					//we're in portrait, so launch the favorites activity
+					
+				}
+				break;
 			default:
 				break;
 		}
@@ -698,6 +708,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 
 	@Override
 	public void applyFilter(CharSequence s) {
+		System.out.println("Filter data called!");
 		mainFragment.filterData(s);
 	}
 

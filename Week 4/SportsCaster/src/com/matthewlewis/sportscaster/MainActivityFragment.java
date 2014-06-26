@@ -86,12 +86,16 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 			if(savedList != null)
 			{
 				setData(getActivity(), savedList);
+				
+				String searchedTerm = savedInstanceState.getString("searched");
+				if (searchedTerm != null)
+				{
+					setFooter(searchedTerm);
+				}
+			} else {
+				parentActivity.applyAdapter(getActivity(), MainActivity.list);
 			}
-			String searchedTerm = savedInstanceState.getString("searched");
-			if (searchedTerm != null)
-			{
-				setFooter(searchedTerm);
-			}
+			
 		}
 		
 		View view = inflater.inflate(R.layout.activity_main, container);
@@ -216,7 +220,7 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 	
 	//this method controls our dynamic footer, which displays data relevant to the stories within the listview.  When the user enters a search
 	//the footer displays the number of results, the searched string, and a button to reset the listview.
-	public void setFooter(String searchedString) {
+	public void setFooter(String searched) {
 		//need to remove any instances of previous listView footer
 		if (listFooter != null)
 		{
@@ -238,8 +242,9 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 				numResults.setText(lengthString);
 				
 				//populate our data according to whether a string is passed, which determines if the user searched something
-				if (searchedString != null)
+				if (searched != null)
 				{
+					searchedString = searched;
 					defaultLabel.setText(R.string.footer_regularLabel);
 					searchedLabel.setText("\""+searchedString+"\"");
 					searchedLabel.setVisibility(View.VISIBLE);
@@ -259,6 +264,9 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 							resetBtn.setVisibility(View.GONE);
 							//reset our listview using parentActivity's unmodified data
 							parentActivity.applyAdapter(getActivity(), MainActivity.list);
+							//need to set our "newList" variable to null so we don't accidentally restore old search on rotation
+							newList = null;
+							searchedString = null;
 						}
 						
 					});
@@ -278,17 +286,17 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 		if (newList != null)
 		{
 			savedInstanceState.putSerializable("data", newList);
+			
+			//if there was a term that was searched for, grab it and save it so we can repopulate the list accordingly 
+			TextView searchedLabel = (TextView) listFooter.findViewById(R.id.footer_searchLabel);
+			String searched = searchedLabel.getText().toString();
+			if (!(searched.equals("searched string")))
+			{
+				System.out.println("Saving the searched term:  " + searched);
+				savedInstanceState.putString("searched", searched);
+			}
 		} else {
 			savedInstanceState.putSerializable("data", storyItems);
-		}
-		
-		//if there was a term that was searched for, grab it and save it so we can repopulate the list accordingly 
-		TextView searchedLabel = (TextView) listFooter.findViewById(R.id.footer_searchLabel);
-		String searched = searchedLabel.getText().toString();
-		if (!(searched.equals("searched string")))
-		{
-			System.out.println("Saving the searched term:  " + searched);
-			savedInstanceState.putString("searched", searched);
 		}
 	}
 	

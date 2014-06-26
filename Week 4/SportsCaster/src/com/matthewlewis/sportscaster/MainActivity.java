@@ -54,6 +54,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	private static String apiURL = "http://api.espn.com/v1/now/popular?limit=10&apikey=q82zaw4uydmpw6ccfcgh8ze2";
 	public static Context context;
 	public static String fileName = "Stories.txt";
+	public static String favFileName = "Favorites.txt";
 	static ArrayList<HashMap<String, Object>> list;
 	private View ratingAlert;
 	private String alertTitle;
@@ -236,10 +237,10 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 				if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 					//detect if we're in landscape, and if so, we need to give user a choice to either add the 
 					//currently selected story to favorites, or display the actual favorites activity
-				
+					System.out.println("Favorites tapped in landscape!");
 				} else {
 					//we're in portrait, so launch the favorites activity
-					
+					System.out.println("Favorites tapped in portrait!");
 				}
 				break;
 			default:

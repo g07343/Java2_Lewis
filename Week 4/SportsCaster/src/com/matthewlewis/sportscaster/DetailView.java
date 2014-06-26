@@ -15,13 +15,20 @@ package com.matthewlewis.sportscaster;
 
 
 import java.util.HashMap;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class DetailView extends Activity implements DetailViewFragment.detailsFragmentInterface {
 	
@@ -33,6 +40,7 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 	String date;
 	Integer rating;
 	Bitmap image;
+	boolean alreadySaved;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +48,9 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 			
 		setContentView(R.layout.fragment_detail);
 			
+		//set up our boolean to help in toggling the saved favorite state
+		alreadySaved = false;
+		
 		// set up our reference to the MainActivityFragment so we can use it to
 		// call methods when needed
 		detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
@@ -74,6 +85,15 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 		
 		//call a method to send our data to our child fragment
 		displayDetails(title, date, description, imageUrl, storyUrl);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		//inflate our custom menu for this activity so that the user can save stories as favorites
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.detail_menu, menu);
+		
+		return super.onCreateOptionsMenu(menu);
 	}
 	
 	//override the default "back button" method to allow us to detect it and go back to MainActivity
@@ -128,10 +148,64 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 		super.finish();
 	}
 
-	// the below function simply detects when the user returns to the
-	// MainActivity using the back button in the ActionBar
+	// the below function detects which button in the action bar is selected - either the back button or the favorites icon
 	public boolean onOptionsItemSelected(MenuItem item) {
-		this.finish();
+		//get the id of whatever is selected, so we know if it is the favorites icon
+		int id = item.getItemId();
+		if (id == R.id.menu_detail_favorite)
+		{  
+			FileManager fileManager = FileManager.GetInstance();
+			if (alreadySaved == false) {
+				JSONObject story = new JSONObject();
+				try {
+					story.put("title", title);
+					story.put("date", date);
+					story.put("imageUrl", imageUrl);
+					story.put("storyUrl", storyUrl);
+					story.put("rating", rating);
+					story.put("description", description);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				String isFavorite = fileManager.writeFavorites(getApplicationContext(), MainActivity.favFileName, story);
+				if (isFavorite != null) {
+					if (isFavorite.equals("Story is already a favorite"))
+					{
+						alreadySaved = true;
+						//alert user they previously saved this story and set our boolean to false to allow them to delete it if they want to
+						Toast.makeText(getApplicationContext(),
+								"This story was already a favorite.  Tap the icon again to unfavorite.",
+								Toast.LENGTH_LONG).show();
+						
+					} else {
+						alreadySaved = true;
+						//story successfully saved, alert user
+						Toast.makeText(getApplicationContext(),
+								"Story successfully saved!  To remove it, tap the icon again.",
+								Toast.LENGTH_LONG).show();
+					}
+				} else {
+					alreadySaved = true;
+					//story successfully saved, alert user
+					Toast.makeText(getApplicationContext(),
+							"Story successfully saved!  To remove it, tap the icon again.",
+							Toast.LENGTH_LONG).show();
+				}
+				
+			} else {
+				//story was already saved previously, so delete it and alert the user
+				fileManager.deleteFavorite(getApplicationContext(), MainActivity.favFileName, title);
+				Toast.makeText(getApplicationContext(),
+						"Story removed from favorites.  To add again, tap the icon.",
+						Toast.LENGTH_LONG).show();
+				alreadySaved = false;
+			}
+			
+		} else {
+			//since there is only the favorites or the back button, it must be back
+			this.finish();
+		}
 		return true;
 	}
 
@@ -153,4 +227,5 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
 }

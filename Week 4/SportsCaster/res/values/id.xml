@@ -117,4 +117,16 @@
     <item
         type="id"
         name="preferences_detailDisclosure"/>
+    <item
+        type="id"
+        name="favorites_title"/>
+    <item
+        type="id"
+         name="favorites_warning"/>
+    <item
+        type="id"
+         name="favorites_listView"/>
+    <item
+        type="id"
+         name="menu_detail_favorite"/>
 </resources>

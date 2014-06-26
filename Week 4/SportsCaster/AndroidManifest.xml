@@ -38,6 +38,14 @@
                 
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.matthewlewis.sportscaster.InfoFragment"
+            android:label ="@string/info_activityTitle"
+            android:theme="@style/Theme.Transparent" >
+            <intent-filter>
+                
+            </intent-filter>
+        </activity>
         <service android:name="APIService"></service>
     </application>
 

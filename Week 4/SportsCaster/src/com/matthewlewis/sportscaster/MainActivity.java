@@ -236,6 +236,13 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		switch(id) {
+		
+		case R.id.menu_info:
+			//user selected the "info" option within the action bar.  Start the "floating window" activity
+			Intent infoIntent = new Intent(context, InfoFragment.class);
+			startActivityForResult(infoIntent, 0);
+			
+			break;
 			case R.id.menu_search:
 				SearchFragment searchFrag = SearchFragment.newInstance();
 				searchFrag.show(getFragmentManager(), "search_dialog");

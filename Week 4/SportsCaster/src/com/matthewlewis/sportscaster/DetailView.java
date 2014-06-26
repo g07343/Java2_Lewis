@@ -38,9 +38,11 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 	DetailViewFragment detailFragment;
 	String description;
 	String date;
-	Integer rating;
+	static Integer rating;
 	Bitmap image;
 	boolean alreadySaved;
+	boolean changedFavStatus;
+	HashMap<String, Object> storyData;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,10 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 			
 		setContentView(R.layout.fragment_detail);
 			
+		//in case the user edits the favorites status after launching this activity from the "favorites" activity,
+		//we need a boolean to send back instructing the calling activity to refresh its listview
+		changedFavStatus = false;
+		
 		//set up our boolean to help in toggling the saved favorite state
 		alreadySaved = false;
 		
@@ -82,7 +88,13 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 		description = (String) storyData.get("description");
 		imageUrl = (String) storyData.get("imageLink");
 		storyUrl = (String) storyData.get("url");
-		
+		rating = (Integer) storyData.get("rating");
+		if (rating != null)
+		{
+			setRating(rating);
+		} else {
+			rating = 0;
+		}
 		//call a method to send our data to our child fragment
 		displayDetails(title, date, description, imageUrl, storyUrl);
 	}
@@ -139,7 +151,7 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 		data.putExtra("link", storyUrl);
 		data.putExtra("description", description);
 		data.putExtra("imageLink", imageUrl );
-		
+		data.putExtra("changedFav", changedFavStatus);
 		//we only really need to pass the title and rating if the device is in portrait
 		data.putExtra("title", title);
 		data.putExtra("rating", rating);
@@ -154,6 +166,8 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 		int id = item.getItemId();
 		if (id == R.id.menu_detail_favorite)
 		{  
+			//set this to true, even if the user doesn't end up changing it (for now)
+			changedFavStatus = true;
 			FileManager fileManager = FileManager.GetInstance();
 			if (alreadySaved == false) {
 				JSONObject story = new JSONObject();
@@ -213,7 +227,7 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 	public void displayDetails(String storyTitle, String storyDate,
 			String storyDescription, String imageLink, final String storyLink) {
 		detailFragment.populateData(storyTitle, storyDate, storyDescription,
-				imageLink, storyLink, null);
+				imageLink, storyLink, rating);
 	}
 
 	//lets us set the rating for our child fragment's "rating" integer
@@ -225,7 +239,7 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 	@Override
 	public Integer getRating() {
 		// TODO Auto-generated method stub
-		return null;
+		return rating;
 	}
 	
 }

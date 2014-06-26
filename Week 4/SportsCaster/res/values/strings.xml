@@ -47,4 +47,13 @@
 	<string name="favorites_activityLabel">Favorites</string>
 	<string name="contextual_addItem">Add story to Favorites!</string>
 	<string name="contextual_goTo">Go to Favorites</string>
+	<string name="info_title">About SportsCaster</string>
+	<string name="info_subheading1">Written by:                   Matthew Lewis</string>
+	<string name="info_subheading2">Designed by:                  Matthew Lewis</string>
+	<string name="info_subheading3">Cursed at by:                 Matthew Lewis</string>
+	<string name="info_subheading4">Finally accepted by:          Matthew Lewis</string>
+	<string name="info_subheading5">All data displayed in SportsCaster is provided by ESPN.  All characters appearing in this work are real. Any resemblance to real persons, living or dead, is 100% purposeful.</string>
+	<string name="info_closeBtn">Close</string>
+	<string name="info_activityTitle">Info</string>
+	<string name="ratingIcon_contentDesc">rating saved for story</string>
 </resources>

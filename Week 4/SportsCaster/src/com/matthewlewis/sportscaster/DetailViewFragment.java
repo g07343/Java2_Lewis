@@ -101,7 +101,7 @@ public class DetailViewFragment extends Fragment implements OnRatingBarChangeLis
 		if (savedRating != null)
 		{
 			ratingBar.setRating(savedRating);
-		}
+		} 
 		
 		//set a text size according to device orientation, which helps us with the description text being too large
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)

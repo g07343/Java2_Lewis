@@ -5,6 +5,9 @@
         name="internet_warning"/>
     <item
         type="id"
+        name="main_container"/>
+    <item
+        type="id"
          name="user_label"/>
     <item
         type="id"
@@ -143,10 +146,17 @@
          name="favRow_bgToggle"/>
     <item
         type="id" 
+        name="favRow_rating"/>
+    <item
+        type="id" 
         name="contextual_addFav"/>
     <item
         type="id" 
         name="contextual_goToFav"/>
     <item
-        type="id" name="contextual_menuHolder"/>
+        type="id" 
+        name="contextual_menuHolder"/>
+    <item
+        type="id"
+        name="info_closeBtn"/>
 </resources>

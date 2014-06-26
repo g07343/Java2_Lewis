@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -35,6 +36,8 @@ public class FavoritesActivity extends Activity{
 	String fileName;
 	boolean editing;
 	private Activity thisActivity;
+	ArrayList<HashMap<String, Object>> list;
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +78,11 @@ public class FavoritesActivity extends Activity{
 		//get our saved stories from the FileManager
 		FileManager fileManager = FileManager.GetInstance();
 		JSONArray favorites = fileManager.readFavorites(baseContext, fileName);
-		System.out.println("Array of stories was:  " + favorites);
+		
 		//create and apply an adapter for our listview
 		if (favorites != null && favorites.length() > 0) {
 			JSONObject storyObject = new JSONObject();
-			ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+			list = new ArrayList<HashMap<String, Object>>();
 			for (int i = 0; i < favorites.length(); i++) {
 				try {
 					storyObject = favorites.getJSONObject(i);
@@ -89,12 +92,47 @@ public class FavoritesActivity extends Activity{
 				}
 				HashMap<String, Object> storyMap = new HashMap<String, Object>();
 				try {
-					storyMap.put("title", storyObject.get("title"));
+					storyMap.put("headline", storyObject.get("title"));
 					storyMap.put("date", storyObject.get("date"));
-					storyMap.put("imageUrl", storyObject.get("imageUrl"));
-					storyMap.put("storyUrl", storyObject.get("storyUrl"));
+					storyMap.put("imageLink", storyObject.get("imageUrl"));
+					storyMap.put("url", storyObject.get("storyUrl"));
 					storyMap.put("description", storyObject.get("description"));
 					storyMap.put("rating", storyObject.get("rating"));
+					
+					//need to check what rating was saved so we can properly set the related image in the listView items
+					int iconId;
+					int savedRating = storyObject.getInt("rating");
+					switch (savedRating) {
+					
+						case 0:
+							iconId = R.drawable.zerostar;
+							break;
+						
+						case 1:
+							iconId = R.drawable.onestar;
+							break;
+							
+						case 2:
+							iconId = R.drawable.twostar;
+							break;
+							
+						case 3:
+							iconId = R.drawable.threestar;
+							break;
+							
+						case 4:
+							iconId = R.drawable.fourstar;
+							break;
+							
+						case 5:
+							iconId = R.drawable.fivestar;
+							break;
+							
+						default:
+							iconId = R.drawable.zerostar;	
+							break;
+					} 
+					storyMap.put("ratingIcon", iconId);
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -103,10 +141,10 @@ public class FavoritesActivity extends Activity{
 			}
 			//now that we have all of our data, create an adapter to populate our customized listView rows
 			SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), list,
-					R.layout.favorites_row, new String[] { (String) "title",
-							(String) "date", "description"},
+					R.layout.favorites_row, new String[] { (String) "headline",
+							(String) "date", "description", "ratingIcon"},
 					new int[] { R.id.favRow_title, R.id.favRow_date, R.id.favRow_description,
-							});
+							R.id.favRow_rating});
 			System.out.println("SetData method called on Fragment side!");
 			//set our adapter
 			listView.setAdapter(adapter);
@@ -147,6 +185,12 @@ public class FavoritesActivity extends Activity{
 		        		.show();
 					} else {
 						//editing is currently off, so launch the DetailView using this story's data (may not have time to implement this)
+						HashMap<String, Object> dataMap = list.get(position);
+						System.out.println("Selected position in listview was:  " + position);
+						System.out.println("Story hashmap being sent is:  "  + dataMap);
+						Intent showDetail = new Intent(getBaseContext(), DetailView.class);
+				    	showDetail.putExtra("data", dataMap);
+				    	startActivityForResult(showDetail, 0);
 					}
 					
 				}
@@ -198,7 +242,7 @@ public class FavoritesActivity extends Activity{
 		// create and apply an adapter for our listview
 		if (favorites != null && favorites.length() > 0) {
 			JSONObject storyObject = new JSONObject();
-			ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+			list = new ArrayList<HashMap<String, Object>>();
 			for (int i = 0; i < favorites.length(); i++) {
 				try {
 					storyObject = favorites.getJSONObject(i);
@@ -208,12 +252,48 @@ public class FavoritesActivity extends Activity{
 				}
 				HashMap<String, Object> storyMap = new HashMap<String, Object>();
 				try {
-					storyMap.put("title", storyObject.get("title"));
+					storyMap.put("headline", storyObject.get("title"));
 					storyMap.put("date", storyObject.get("date"));
-					storyMap.put("imageUrl", storyObject.get("imageUrl"));
-					storyMap.put("storyUrl", storyObject.get("storyUrl"));
+					storyMap.put("imageLink", storyObject.get("imageUrl"));
+					storyMap.put("url", storyObject.get("storyUrl"));
 					storyMap.put("description", storyObject.get("description"));
 					storyMap.put("rating", storyObject.get("rating"));
+					
+					//need to check what rating was saved so we can properly set the related image in the listView items
+					int iconId;
+					int savedRating = storyObject.getInt("rating");
+					switch (savedRating) {
+					
+						case 0:
+							iconId = R.drawable.zerostar;
+							break;
+						
+						case 1:
+							iconId = R.drawable.onestar;
+							break;
+							
+						case 2:
+							iconId = R.drawable.twostar;
+							break;
+							
+						case 3:
+							iconId = R.drawable.threestar;
+							break;
+							
+						case 4:
+							iconId = R.drawable.fourstar;
+							break;
+							
+						case 5:
+							iconId = R.drawable.fivestar;
+							break;
+							
+						default:
+							iconId = R.drawable.zerostar;	
+							break;
+					} 
+					storyMap.put("ratingIcon", iconId);
+					
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -223,10 +303,10 @@ public class FavoritesActivity extends Activity{
 			// now that we have all of our data, create an adapter to populate
 			// our customized listView rows
 			SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), list,
-					R.layout.favorites_row, new String[] { (String) "title",
-							(String) "date", "description" }, new int[] {
+					R.layout.favorites_row, new String[] { (String) "headline",
+							(String) "date", "description", "ratingIcon" }, new int[] {
 							R.id.favRow_title, R.id.favRow_date,
-							R.id.favRow_description, });
+							R.id.favRow_description, R.id.favRow_rating});
 			System.out.println("SetData method called on Fragment side!");
 			// set our adapter
 			listView.setAdapter(adapter);
@@ -235,6 +315,21 @@ public class FavoritesActivity extends Activity{
 			listView.invalidate();
 			warning.setText(R.string.favorites_noStories);
 			warning.setTextColor(Color.RED);
+		}
+	}
+	
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		//check to make sure our detailView exited successfully, and then get the returned data
+		if (resultCode == RESULT_OK && requestCode == 0)
+		{
+			Bundle result = data.getExtras();
+			boolean wasChanged = result.getBoolean("changedFav");
+			if (wasChanged == true)
+			{
+				reloadList();
+			}
 		}
 	}
 }

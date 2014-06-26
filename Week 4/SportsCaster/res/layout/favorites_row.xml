@@ -43,6 +43,15 @@
                     android:gravity="center"
                     android:text="@string/date_text"
                     android:textColor="#4F5E64" />
+
+                <ImageView
+                    android:id="@id/favRow_rating"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/ratingIcon_contentDesc"
+                    android:src="@drawable/zerostar" />
+
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

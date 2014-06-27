@@ -9,6 +9,7 @@
  * 
  * Purpose The DetailView class holds the detail activity, which is loaded whenever the user selects a sports story from 
  * MainActivity's listview.  It is passed all of the data it needs to display to the user, and returns the rating the user set.
+ * As of week 4, it also has the capability to display any saved "Favorite" stories the user wanted to keep.
  * 
  */
 package com.matthewlewis.sportscaster;
@@ -89,6 +90,8 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 		imageUrl = (String) storyData.get("imageLink");
 		storyUrl = (String) storyData.get("url");
 		rating = (Integer) storyData.get("rating");
+		//check if rating is null or not, which can be different depending on if DetailView was launched
+		//from the MainActivity, or from the FavoritesActivity
 		if (rating != null)
 		{
 			setRating(rating);
@@ -98,6 +101,7 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 		//call a method to send our data to our child fragment
 		displayDetails(title, date, description, imageUrl, storyUrl);
 	}
+	
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -167,11 +171,19 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 		if (id == R.id.menu_detail_favorite)
 		{  
 			//set this to true, even if the user doesn't end up changing it (for now)
+			//this is VERY important, as it allows the favorites activity to reset it's listview in the event
+			//the user chose to "unfavorite" a story from here.  This way we don't display old data
 			changedFavStatus = true;
+			
+			//grab our FileManager singleton to allow the user to either favorite or unfavorite the story
 			FileManager fileManager = FileManager.GetInstance();
+			
+			//check our boolean that tells us whether the story has been saved or not.  By default, this is false the first time
 			if (alreadySaved == false) {
+				//create a JSONObject to hold the stories data
 				JSONObject story = new JSONObject();
 				try {
+					//grab all needed data for the story and add to JSONObject
 					story.put("title", title);
 					story.put("date", date);
 					story.put("imageUrl", imageUrl);
@@ -182,12 +194,16 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				//attempt to save/favorite the story, and capture the returned string for evaluation
 				String isFavorite = fileManager.writeFavorites(getApplicationContext(), MainActivity.favFileName, story);
+				
+				//if the string is valid and equals "Story is already a favorite", it had already been saved
 				if (isFavorite != null) {
 					if (isFavorite.equals("Story is already a favorite"))
 					{
-						alreadySaved = true;
 						//alert user they previously saved this story and set our boolean to false to allow them to delete it if they want to
+						alreadySaved = true;
 						Toast.makeText(getApplicationContext(),
 								"This story was already a favorite.  Tap the icon again to unfavorite.",
 								Toast.LENGTH_LONG).show();
@@ -200,6 +216,7 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 								Toast.LENGTH_LONG).show();
 					}
 				} else {
+					//set our boolean to "true", since the returned string was null, meaning it was written successfully
 					alreadySaved = true;
 					//story successfully saved, alert user
 					Toast.makeText(getApplicationContext(),
@@ -213,6 +230,8 @@ public class DetailView extends Activity implements DetailViewFragment.detailsFr
 				Toast.makeText(getApplicationContext(),
 						"Story removed from favorites.  To add again, tap the icon.",
 						Toast.LENGTH_LONG).show();
+				
+				//set our boolean to false, so that the user can re-add if they choose to
 				alreadySaved = false;
 			}
 			

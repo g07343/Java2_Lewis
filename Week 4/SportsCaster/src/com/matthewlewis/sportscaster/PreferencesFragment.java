@@ -65,6 +65,7 @@ public class PreferencesFragment extends DialogFragment{
 		//depending on if there is already user data, we need to alter how this dialog displays, so check for defaults first
 		prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		
+		//grab our saved username, and check if it exists
 		String savedName = prefs.getString("userName", "");
 		
 		if(savedName.isEmpty()) {
@@ -84,7 +85,7 @@ public class PreferencesFragment extends DialogFragment{
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
+				//user clicked saved, so grab the inputted data
 				String userName = nameField.getText().toString();
 				String sport = sportField.getText().toString();
 				
@@ -103,10 +104,11 @@ public class PreferencesFragment extends DialogFragment{
 			}
 			
 		});
-		
+		//build fragment and return
 		return builder.create();
 	}
 	
+	//this simply returns an instance of the PreferencesFragment
 	public static PreferencesFragment newInstance() {
 		
 		PreferencesFragment prefFrag = new PreferencesFragment();

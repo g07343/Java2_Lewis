@@ -229,6 +229,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 		return super.onPrepareOptionsMenu(menu);
 	}
 	
+	//this overriden method detects which option within the Action Bar was selected.
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action bar item clicks here. The action bar will
@@ -244,15 +245,18 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			
 			break;
 			case R.id.menu_search:
+				//user selected the search option within action bar, so instantiate the searchFragment and display
 				SearchFragment searchFrag = SearchFragment.newInstance();
 				searchFrag.show(getFragmentManager(), "search_dialog");
 				break;
 			
 			case R.id.menu_preferences:
+				//user selected preferences option within action bar, so instantiate the preferencesFragment and display
 				PreferencesFragment prefFrag = PreferencesFragment.newInstance();
 				prefFrag.show(getFragmentManager(), "preferences_dialog");
 				break;
 			case R.id.menu_favorites:
+				//favorites was selected
 				if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 					//detect if we're in portrait, and if so, load Favorites Activity.  We only do this in portrait,
 					//because in landscape there is a contextual menu that dynamically displays the below 2 options
@@ -260,17 +264,21 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			    	startActivityForResult(showFavorites, 0);
 				}
 				break;
+				//the "addFavorite" option was selected in landscape mode, so grab all data from the story currently displayed in 
+				//the detailFragment
 			case R.id.contextual_addFav:
-				//user tapped the 'add favorite' option from contextual menu in landscape
-				System.out.println("ADD FAV");
+				//grab all data from detailsfragment
 				String title = detailFragment.titleView.getText().toString();
 				String date = detailFragment.dateView.getText().toString();
 				String imageUrl = detailFragment.imageUrl;
 				String storyUrl = detailFragment.storyUrl;
 				String description = detailFragment.descriptionView.getText().toString();
 				int rating = (int) detailFragment.ratingBar.getRating();
+				
+				//create a new JSONObject to store the data
 				JSONObject storyObject = new JSONObject();
 				try {
+					//attempt to add data to JSONObject for saving
 					storyObject.put("title", title);
 					storyObject.put("date", date);
 					storyObject.put("imageUrl", imageUrl);
@@ -280,18 +288,24 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 					
 					//send the JSON formatted story for saving and check the returned String for success
 					FileManager fileManager = FileManager.GetInstance();
+					
+					//try to save story, capturing the returned string for evaluation
 					String wasSaved = fileManager.writeFavorites(context, favFileName, storyObject);
+					
+					//if the string was valid, then the story was previously saved
 					if (wasSaved != null) {
 						if (wasSaved.equals("Story is already a favorite")) {
 							Toast.makeText(getApplicationContext(),
 									"This story was already a favorite!",
 									Toast.LENGTH_LONG).show();
 						} else {
+							//string returned was null, meaning saving was successful
 							Toast.makeText(getApplicationContext(),
 									"Story favorited!",
 									Toast.LENGTH_LONG).show();
 						}
 					} else {
+						//string returned was null, meaning saving was successful
 						Toast.makeText(getApplicationContext(),
 								"Story favorited!",
 								Toast.LENGTH_LONG).show();
@@ -303,7 +317,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 				}
 				break;
 			case R.id.contextual_goToFav:
-				//user tapped the 'go to favorites' option from contextual menu in landscape
+				//user tapped the 'go to favorites' option from contextual menu in landscape so load the favorites activity
 				System.out.println("GOTO FAV");
 				Intent showFavorites = new Intent(context, FavoritesActivity.class);
 		    	startActivityForResult(showFavorites, 0);
@@ -584,6 +598,7 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 			
 		}
 		
+		//retain the string that the user searched for, if there was one
 		if (mainFragment.searchedString != null)
 		{
 			savedInstanceState.putString("searched", mainFragment.searchedString);

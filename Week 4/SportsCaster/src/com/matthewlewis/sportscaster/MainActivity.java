@@ -694,54 +694,57 @@ public class MainActivity extends Activity implements MainActivityFragment.mainF
 	//which row was selected in its listview.  Since we already have the data here, no need to pass it back.
 	@Override
 	public void itemSelected(int position, String title) {
-		//convert our position to the correct one chosen by the user
-		int actualSelected = position -=1;
 		
-		//grab the hashmap with our selected story's data
-		HashMap<String, Object> dataMap = null;
-		
-		//get an instance of the detailsViewFragment so we can check if it is valid
-		detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
-		
-		if (title != null)
+		if (!(position < 1 || position > 10))
 		{
-			System.out.println("Selected story was:  " + title);
+			//convert our position to the correct one chosen by the user
+			int actualSelected = position -=1;
 			
-			for (int i = 0; i < list.size(); i++)
+			//grab the hashmap with our selected story's data
+			HashMap<String, Object> dataMap = null;
+			
+			//get an instance of the detailsViewFragment so we can check if it is valid
+			detailFragment = (DetailViewFragment) getFragmentManager().findFragmentById(R.id.detail_fragment);
+			
+			if (title != null)
 			{
-				HashMap<String, Object> storyData = list.get(i);
-				String savedTitle = (String) storyData.get("headline");
-				if (savedTitle.equals(title))
+				System.out.println("Selected story was:  " + title);
+				
+				for (int i = 0; i < list.size(); i++)
 				{
-					dataMap = storyData;
-					break;
+					HashMap<String, Object> storyData = list.get(i);
+					String savedTitle = (String) storyData.get("headline");
+					if (savedTitle.equals(title))
+					{
+						dataMap = storyData;
+						break;
+					}
 				}
+			} else {
+				dataMap = list.get(actualSelected);
 			}
-		} else {
-			dataMap = list.get(actualSelected);
+			
+			//check to make sure we have our fragment and it is currently in the view (landscape)
+			if (detailFragment != null && detailFragment.isInLayout())
+			{   //grab our data for the selected story 	
+		    	savedTitle = (String) dataMap.get("headline");
+		    	savedDate = (String) dataMap.get("date");
+		    	savedDescription = (String) dataMap.get("description");
+		    	savedImageUrl = (String) dataMap.get("imageLink");
+		    	savedStoryUrl = (String) dataMap.get("url");
+		    	
+		    	//reset the image of the DetailFragment just in case, otherwise it won't display the correct one
+		    	detailFragment.clearImage();
+		    	
+		    	//set our new data to the detailFragment
+		    	detailFragment.populateData(savedTitle, savedDate, savedDescription, savedImageUrl, savedStoryUrl, savedRating);
+			} else {
+				//send the data to the DetailsActivity, since our second fragment hasn't been initialized
+		    	Intent showDetail = new Intent(context, DetailView.class);
+		    	showDetail.putExtra("data", dataMap);
+		    	startActivityForResult(showDetail, 0);
+			}
 		}
-		
-		//check to make sure we have our fragment and it is currently in the view (landscape)
-		if (detailFragment != null && detailFragment.isInLayout())
-		{   //grab our data for the selected story 	
-	    	savedTitle = (String) dataMap.get("headline");
-	    	savedDate = (String) dataMap.get("date");
-	    	savedDescription = (String) dataMap.get("description");
-	    	savedImageUrl = (String) dataMap.get("imageLink");
-	    	savedStoryUrl = (String) dataMap.get("url");
-	    	
-	    	//reset the image of the DetailFragment just in case, otherwise it won't display the correct one
-	    	detailFragment.clearImage();
-	    	
-	    	//set our new data to the detailFragment
-	    	detailFragment.populateData(savedTitle, savedDate, savedDescription, savedImageUrl, savedStoryUrl, savedRating);
-		} else {
-			//send the data to the DetailsActivity, since our second fragment hasn't been initialized
-	    	Intent showDetail = new Intent(context, DetailView.class);
-	    	showDetail.putExtra("data", dataMap);
-	    	startActivityForResult(showDetail, 0);
-		}
-		
 	}
 	
 //using this method, we can send the data for our listview to our fragment to apply

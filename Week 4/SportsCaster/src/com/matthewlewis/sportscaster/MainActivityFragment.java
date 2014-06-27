@@ -196,25 +196,43 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 		}
 	}
 	
+	//this method is called by the MainActivity class, and lets us filter our listview according to what
+	//the user is searching for.  
 	public void filterData(CharSequence s) {
+		
+		//create a new arraylist to hold the results
 		newList = new ArrayList<HashMap<String, Object>>();
+		
+		//convert to string
 		String searchParam = s.toString();
+		
+		//set up our variable, which we use in MainActivity to check if the user had searched something upon rotation
 		searchedString = searchParam;
+		
+		//loop through each item contained within the listview's adapter
 		for(int i = 0; i < adapter.getCount(); i++)
 		{
 			@SuppressWarnings("unchecked")
 			HashMap<String, Object> currentStory = (HashMap<String, Object>) adapter.getItem(i);
-			//System.out.println("Passed converted char sequence is:  " + searchParam);
+			
+			//get the title of the current story and convert to lowerCase, so we can compare against both
 			String currentTitle = (String) currentStory.get("headline");
 			String currentTitleLowerCase = currentTitle.toLowerCase(Locale.US);
+			
+			//the mother of all manually written filter 'if' checks.  Check our search parameter against both the
+			//2 above strings, as well as using a lowercase version of itself as well.  Whew.
 			if (currentTitle.contains(searchParam) || currentTitleLowerCase.contains(searchParam) || currentTitle.contains(searchParam.toLowerCase(Locale.US)) || currentTitleLowerCase.contains(searchParam.toLowerCase()))
 			{
+				//found a match, so grab that hashmap and add to our new arrayList
 				HashMap<String, Object> dataMap = storyItems.get(i);
 				newList.add(dataMap);
 			}
 		}
 		
+		//set our new array list to the listview
 		setData(MainActivity.context, newList);
+		
+		//set our footer to display our searched term
 		setFooter(searchParam);
 	}
 	
@@ -259,7 +277,6 @@ public class MainActivityFragment extends Fragment implements OnClickListener{
 
 						@Override
 						public void onClick(View v) {
-							// TODO Auto-generated method stub
 							searchedLabel.setVisibility(View.GONE);
 							resetBtn.setVisibility(View.GONE);
 							//reset our listview using parentActivity's unmodified data
